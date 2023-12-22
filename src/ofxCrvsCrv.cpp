@@ -120,7 +120,7 @@ std::vector<float> Crv::floatArray(int numSamples) {
     return floatArray(numSamples, Component::Y);
 }
 
-std::vector<glm::vec2> Crv::vectorArray(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp)
+std::vector<glm::vec2> Crv::glv2Array(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp)
 {
     std::vector<glm::vec2> points(numPoints);
     for (int i = 0; i < numPoints; ++i) {
@@ -134,9 +134,23 @@ std::vector<glm::vec2> Crv::vectorArray(int numPoints, bool windowed, bool trans
     return points;
 }
 
-std::vector<std::vector<float>> Crv::pointArray(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp)
+std::vector<glm::vec3> Crv::glv3Array(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp)
 {
-    std::vector<glm::vec2> vectors = vectorArray(numPoints, windowed, transformed, samplingRateOp);
+    std::vector<glm::vec3> vectors(numPoints);
+    for (int i = 0; i < numPoints; ++i) {
+        float x = static_cast<float>(i) / (numPoints - 1);
+        if (samplingRateOp != nullptr) x = samplingRateOp(x);
+        if (windowed)
+            vectors[i] = glm::vec3(wVector(x, transformed), 0.f);
+        else
+            vectors[i] = glm::vec3(uVector(x, transformed), 0.f);;
+    }
+    return vectors;
+}
+
+std::vector<std::vector<float>> Crv::coordinateArray(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp)
+{
+    std::vector<glm::vec2> vectors = glv2Array(numPoints, windowed, transformed, samplingRateOp);
     std::vector<std::vector<float>> points(numPoints, std::vector<float>(2));
     for (int i = 0; i < numPoints; ++i) {
         points[i][0] = vectors[i].x;
@@ -145,9 +159,41 @@ std::vector<std::vector<float>> Crv::pointArray(int numPoints, bool windowed, bo
     return points;
 }
 
+std::vector<ofVec3f> Crv::ofv3Array(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp)
+{
+    std::vector<ofVec3f> vectors(numPoints);
+    for (int i = 0; i < numPoints; ++i) {
+        float x = static_cast<float>(i) / (numPoints - 1);
+        if (samplingRateOp != nullptr) x = samplingRateOp(x);
+        glm::vec2 v;
+        if (windowed)
+            v = wVector(x, transformed);
+        else
+            v = uVector(x, transformed);
+        vectors[i] = ofVec3f(v.x, v.y, 0.f);
+    }
+    return vectors;
+}
+
+std::vector<ofVec2f> Crv::ofv2Array(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp)
+{
+    std::vector<ofVec2f> vectors(numPoints);
+    for (int i = 0; i < numPoints; ++i) {
+        float x = static_cast<float>(i) / (numPoints - 1);
+        if (samplingRateOp != nullptr) x = samplingRateOp(x);
+        glm::vec2 v;
+        if (windowed)
+            v = wVector(x, transformed);
+        else
+            v = uVector(x, transformed);
+        vectors[i] = ofVec2f(v.x, v.y);
+    }
+    return vectors;
+}
+
 ofPolyline Crv::polyline(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp)
 {
-    std::vector<glm::vec2> vectors = vectorArray(numPoints, windowed, transformed, samplingRateOp);
+    std::vector<glm::vec2> vectors = glv2Array(numPoints, windowed, transformed, samplingRateOp);
     ofPolyline polyline;
     for (const auto& v : vectors)
         polyline.addVertex(glm::vec3(v, 0.f));
@@ -226,7 +272,7 @@ glm::vec2 Crv::windowed(glm::vec2 v)
 
 std::vector<Edg> Crv::getWebEdgs(int numPoints, bool windowed, bool transformed, int resolution)
 {
-    std::vector<glm::vec2> vectors = vectorArray(numPoints, windowed, transformed, nullptr);
+    std::vector<glm::vec2> vectors = glv2Array(numPoints, windowed, transformed, nullptr);
     std::vector<Edg> edgs;
     for (int i = 0; i < vectors.size(); ++i) {
         for (int j = 0; j < vectors.size(); ++j) {

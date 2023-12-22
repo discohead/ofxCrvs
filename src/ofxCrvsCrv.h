@@ -138,8 +138,11 @@ public:
     
     std::vector<float> floatArray(int numSamples, Component component);
     std::vector<float> floatArray(int numSamples);
-    std::vector<glm::vec2> vectorArray(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp);
-    std::vector<std::vector<float>> pointArray(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp);
+    std::vector<std::vector<float>> coordinateArray(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp);
+    std::vector<glm::vec2> glv2Array(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp);
+    std::vector<glm::vec3> glv3Array(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp);
+    std::vector<ofVec3f> ofv3Array(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp);
+    std::vector<ofVec2f> ofv2Array(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp);
     ofPolyline polyline(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp);
     
     glm::vec2 uVector(float pos, bool transformed);
