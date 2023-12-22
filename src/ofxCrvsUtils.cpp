@@ -15,7 +15,7 @@ glm::vec2 Utils::transform(glm::vec2 vector, glm::vec2 center, glm::vec2 scale, 
 {
     if (rotationDegrees != 0.f) {
         vector -= center;
-        glm::rotate(vector, glm::radians(rotationDegrees));
+        vector = glm::rotate(vector, glm::radians(rotationDegrees));
         vector += center;
     }
     
@@ -28,6 +28,16 @@ glm::vec2 Utils::transform(glm::vec2 vector, glm::vec2 center, glm::vec2 scale, 
         vector += translation;
     }
     return vector;
+}
+
+std::vector<glm::vec2> Utils::transform(std::vector<glm::vec2> vector, glm::vec2 center, glm::vec2 scale, glm::vec2 translation, float rotationDegrees)
+{
+    std::vector<glm::vec2> transformed;
+    for (auto& v : vector) {
+        glm::vec2 tV = transform(v, center, scale, translation, rotationDegrees);
+        transformed.push_back(tV);
+    }
+    return transformed;
 }
 
 glm::vec2 Utils::clipped(glm::vec2 vector, float xMin, float xMax, float yMin, float yMax)

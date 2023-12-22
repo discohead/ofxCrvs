@@ -3,9 +3,10 @@
 
 #include "ofxCrvsOps.h"
 #include "ofxCrvsWindow.hpp"
+#include "ofxCrvsEdg.hpp"
 
 namespace ofxCrvs {
-
+class Edg;
 /**
  * The enum Component.
  */
@@ -92,6 +93,8 @@ public:
     
     Crv() : Crv(nullptr, nullptr, nullptr, nullptr, nullptr) {}
     
+    Crv(Window window) : Crv(window, nullptr, nullptr, nullptr, nullptr, nullptr, 1.0f, 1.0f, 0.0f, 0.0f) {}
+    
     Crv(FloatOp op) : Crv(op, nullptr, nullptr, nullptr, nullptr) {}
     
     Crv(FloatOp op,
@@ -99,10 +102,10 @@ public:
         std::shared_ptr<Crv> rate,
         std::shared_ptr<Crv> phase,
         std::shared_ptr<Crv> bias)
-    : Crv(Window(ofGetWidth(), ofGetHeight()), op, amp, rate, phase, bias, 1.0f, 1.0f, 0.0f, 0.0f) {}
+    : Crv(Window(0, 0, ofGetWidth(), ofGetHeight()), op, amp, rate, phase, bias, 1.0f, 1.0f, 0.0f, 0.0f) {}
     
     Crv(FloatOp op, float ampOffset, float rateOffset, float phaseOffset, float biasOffset)
-    : Crv(Window(ofGetWidth(), ofGetHeight()), op, nullptr, nullptr, nullptr, nullptr, ampOffset, rateOffset, phaseOffset, biasOffset) {}
+    : Crv(Window(0, 0, ofGetWidth(), ofGetHeight()), op, nullptr, nullptr, nullptr, nullptr, ampOffset, rateOffset, phaseOffset, biasOffset) {}
     
     Crv(Window window,
         FloatOp op,
@@ -137,6 +140,7 @@ public:
     std::vector<float> floatArray(int numSamples);
     std::vector<glm::vec2> vectorArray(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp);
     std::vector<std::vector<float>> pointArray(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp);
+    ofPolyline polyline(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp);
     
     glm::vec2 uVector(float pos, bool transformed);
     glm::vec2 wVector(float pos, bool transformed);
@@ -149,12 +153,15 @@ public:
     glm::vec2 wrapped(glm::vec2 v);
     glm::vec2 folded(glm::vec2 v);
     
-private:
+    std::vector<Edg> getWebEdgs(int numPoints, bool windowed, bool transformed, int resolution);
+    std::vector<Edg> getWebEdgs(int numPoints, bool windowed, bool transformed);
+    
+protected:
     ofBaseApp* app = ofGetAppPtr();
     float calculate(float pos);
     float ampBias(float value, float pos);
     float calcPos(float pos);
-    float componentAt(Component component, float pos);
+    virtual float componentAt(Component component, float pos);
     float quantize(float y);
 };
 } // namespace ofxCrvs

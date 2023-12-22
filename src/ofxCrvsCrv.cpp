@@ -3,6 +3,7 @@
 
 #include "ofxCrvsCrv.h"
 #include "ofxCrvsUtils.hpp"
+#include "ofxCrvsEdg.hpp"
 
 namespace ofxCrvs {
 
@@ -144,6 +145,15 @@ std::vector<std::vector<float>> Crv::pointArray(int numPoints, bool windowed, bo
     return points;
 }
 
+ofPolyline Crv::polyline(int numPoints, bool windowed, bool transformed, FloatOp samplingRateOp)
+{
+    std::vector<glm::vec2> vectors = vectorArray(numPoints, windowed, transformed, samplingRateOp);
+    ofPolyline polyline;
+    for (const auto& v : vectors)
+        polyline.addVertex(glm::vec3(v, 0.f));
+    return polyline;
+}
+
 glm::vec2 Crv::uVector(float pos, bool transformed)
 {
     float x = xAt(pos);
@@ -212,6 +222,25 @@ glm::vec2 Crv::folded(glm::vec2 v)
 glm::vec2 Crv::windowed(glm::vec2 v)
 {
     return window.apply(v);
+}
+
+std::vector<Edg> Crv::getWebEdgs(int numPoints, bool windowed, bool transformed, int resolution)
+{
+    std::vector<glm::vec2> vectors = vectorArray(numPoints, windowed, transformed, nullptr);
+    std::vector<Edg> edgs;
+    for (int i = 0; i < vectors.size(); ++i) {
+        for (int j = 0; j < vectors.size(); ++j) {
+            if (i != j) {
+                edgs.push_back(Edg(vectors[i], vectors[j], resolution));
+            }
+        }
+    }
+    return edgs;
+}
+
+std::vector<Edg> Crv::getWebEdgs(int numPoints, bool windowed, bool transformed)
+{
+    return getWebEdgs(numPoints, windowed, transformed, resolution);
 }
 
 } // namespace ofxCrvs

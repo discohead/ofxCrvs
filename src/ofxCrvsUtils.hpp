@@ -17,6 +17,7 @@ namespace ofxCrvs {
 class Utils {
 public:
     static glm::vec2 transform(glm::vec2 vector, glm::vec2 center, glm::vec2 scale, glm::vec2 translation, float rotationDegrees);
+    static std::vector<glm::vec2> transform(std::vector<glm::vec2> vector, glm::vec2 center, glm::vec2 scale, glm::vec2 translation, float rotationDegrees);
     static glm::vec2 clipped(glm::vec2 vector, float xMin, float xMax, float yMin, float yMax);
 };
 
