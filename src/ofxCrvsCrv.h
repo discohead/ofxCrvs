@@ -33,6 +33,7 @@ class Crv {
 public:
   constexpr static glm::vec2 uCenter = glm::vec2(0.5f, 0.5f);
 
+  Window window;
   FloatOp op;
   std::shared_ptr<Crv> amp;
   std::shared_ptr<Crv> rate;
@@ -52,7 +53,6 @@ public:
   float rotation;
 
   Bounding bounding;
-  Window window;
 
   static std::shared_ptr<Crv> create() { return std::make_shared<Crv>(); }
 
@@ -117,6 +117,8 @@ public:
     if (!op)
       this->op = [](float x) { return x; };
   }
+
+  virtual ~Crv() = default;
 
   float apply(float pos);
   float yAt(float pos);
