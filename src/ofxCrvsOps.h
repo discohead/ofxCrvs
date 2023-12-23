@@ -134,7 +134,7 @@ public:
   FloatOp fold(FloatOp op, FloatOp threshold);
   FloatOp fold(FloatOp op, float threshold);
   FloatOp fold(FloatOp op);
-  FloatOp lowPassFilter(FloatOp inputOp, int windowSize);
+  FloatOp lpf(FloatOp inputOp, int windowSize);
   FloatOp chain(vector<FloatOp> ops);
   FloatOp choose(vector<FloatOp> ops);
 

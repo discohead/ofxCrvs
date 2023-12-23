@@ -324,7 +324,7 @@ FloatOp Ops::fold(FloatOp op) {
   };
 }
 
-FloatOp Ops::lowPassFilter(FloatOp inputOp, int windowSize) {
+FloatOp Ops::lpf(FloatOp inputOp, int windowSize) {
   return [inputOp, windowSize](float pos) {
     float sum = 0.f;
     for (int i = 0; i < windowSize; ++i) {
