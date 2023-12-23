@@ -58,19 +58,19 @@ public:
     return [](float) { return glm::two_pi<float>(); };
   };
   FloatOp appWidth() {
-    return [this](float) { return ofGetWidth(); };
+    return [](float) { return ofGetWidth(); };
   };
   FloatOp appHeight() {
-    return [this](float) { return ofGetHeight(); };
+    return [](float) { return ofGetHeight(); };
   };
   FloatOp frameNum() {
-    return [this](float) { return ofGetFrameNum(); };
+    return [](float) { return ofGetFrameNum(); };
   };
   FloatOp mouseX() {
-    return [this](float) { return ofGetMouseX(); };
+    return [](float) { return ofGetMouseX(); };
   };
   FloatOp mouseY() {
-    return [this](float) { return ofGetMouseY(); };
+    return [](float) { return ofGetMouseY(); };
   };
 
   float pos2Rad(float pos);
@@ -85,6 +85,31 @@ public:
   FloatOp sine(FloatOp fb);
   FloatOp sine();
   FloatOp sine(float fb);
+  FloatOp asin();
+  FloatOp cos(FloatOp fb);
+  FloatOp cos(float fb);
+  FloatOp cos();
+  FloatOp acos();
+  FloatOp tan(FloatOp fb);
+  FloatOp tan(float fb);
+  FloatOp tan();
+  FloatOp pulse(FloatOp w);
+  FloatOp pulse(float w);
+  FloatOp pulse();
+  FloatOp square();
+
+  FloatOp easeIn(FloatOp e);
+  FloatOp easeIn();
+  FloatOp easeIn(float e);
+  FloatOp easeOut(FloatOp e);
+  FloatOp easeOut();
+  FloatOp easeOut(float e);
+  FloatOp easeInOut(FloatOp e);
+  FloatOp easeInOut();
+  FloatOp easeInOut(float e);
+  FloatOp easeOutIn(FloatOp e);
+  FloatOp easeOutIn();
+  FloatOp easeOutIn(float e);
 
   FloatOp gaussian(FloatOp lo, FloatOp hi);
   FloatOp gaussian(FloatOp hi) { return gaussian(nullptr, hi); };
@@ -98,6 +123,27 @@ public:
   FloatOp perlin(FloatOp x, FloatOp y = nullptr, FloatOp z = nullptr,
                  FloatOp falloff = nullptr, FloatOp octaves = nullptr);
 
+  FloatOp mult(FloatOp op, float scalar);
+  FloatOp bias(FloatOp op, float offset);
+  FloatOp bias(FloatOp op, FloatOp offset);
+  FloatOp phase(FloatOp op, float phaseOffset);
+  FloatOp phase(FloatOp op, FloatOp phaseOffset);
+  FloatOp rate(FloatOp op, float rateOffset);
+  FloatOp rate(FloatOp op, FloatOp rateOffset);
+  FloatOp ring(FloatOp opA, FloatOp opB);
+  FloatOp fold(FloatOp op, FloatOp threshold);
+  FloatOp fold(FloatOp op, float threshold);
+  FloatOp fold(FloatOp op);
+  FloatOp lowPassFilter(FloatOp inputOp, int windowSize);
+  FloatOp chain(vector<FloatOp> ops);
+  FloatOp choose(vector<FloatOp> ops);
+
+  vector<float> normalize(vector<float> values);
+  FloatOp timeseries(vector<float> yValues);
+
+  vector<float> floatArray(FloatOp op, int numSamples, FloatOp mapOp = nullptr);
+  vector<glm::vec2> glv2Array(FloatOp curve, float start, float end, int numPoints, float yScale = 1.0f);
+
   float triDist(float lo, float hi, float mode);
   float pNoise(float x, float y, float z, float falloff = 1.f, int octaves = 1);
   float pNoise(float x, float y, float falloff = 1.f, int octaves = 1);
@@ -105,6 +151,8 @@ public:
 
   vector<float> table;
   FloatOp wavetable();
+
+  void plot(FloatOp op, float yScale, ofColor color = ofColor::white, bool fill = false);
 
 private:
   ofBaseApp *app = ofGetAppPtr();
