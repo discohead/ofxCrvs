@@ -62,14 +62,14 @@ FloatOp Ops::sine() { return sine(nullptr); }
 FloatOp Ops::sine(float fb) { return sine(c(fb)); }
 
 FloatOp Ops::asin() {
-  return [](float pos) { 
+  return [](float pos) {
     pos = pos * 2.f - 1.f;
     return (std::asin(pos) + glm::half_pi<float>()) / glm::pi<float>();
   };
 }
 
 FloatOp Ops::cos(FloatOp fb) {
-  return [fb, this](float pos) { 
+  return [fb, this](float pos) {
     if (fb) {
       float fbScale = fb(pos);
       pos = pos + fbScale * (std::cos(pos2Rad(pos)) * 0.5f) + 0.5f;
@@ -83,14 +83,14 @@ FloatOp Ops::cos() { return cos(nullptr); }
 FloatOp Ops::cos(float fb) { return cos(c(fb)); }
 
 FloatOp Ops::acos() {
-  return [](float pos) { 
+  return [](float pos) {
     pos = pos * 2.f - 1.f;
     return std::acos(pos) / glm::pi<float>();
   };
 }
 
 FloatOp Ops::tan(FloatOp fb) {
-  return [fb, this](float pos) { 
+  return [fb, this](float pos) {
     if (fb) {
       float fbScale = fb(pos);
       pos = pos + fbScale * (std::tan(pos2Rad(pos)) * 0.5f) + 0.5f;
@@ -181,8 +181,6 @@ FloatOp Ops::easeOutIn() { return easeOutIn(nullptr); }
 
 FloatOp Ops::easeOutIn(float e) { return easeOutIn(c(e)); }
 
-
-
 FloatOp Ops::gaussian(FloatOp lo, FloatOp hi) {
   return [lo, hi](float pos) {
     float g = ofRandomGaussian(0.f, 1.f);
@@ -252,39 +250,43 @@ FloatOp Ops::bias(FloatOp op, FloatOp offset) {
 }
 
 FloatOp Ops::phase(FloatOp op, float phaseOffset) {
-  return [op, phaseOffset](float pos) { 
+  return [op, phaseOffset](float pos) {
     pos = pos + phaseOffset;
-    if(pos > 1.f) pos = fmod(pos, 1.f);
+    if (pos > 1.f)
+      pos = fmod(pos, 1.f);
     return op(pos);
   };
 }
 
 FloatOp Ops::phase(FloatOp op, FloatOp phaseOffset) {
-  return [op, phaseOffset](float pos) { 
+  return [op, phaseOffset](float pos) {
     pos = pos + phaseOffset(pos);
-    if(pos > 1.f) pos = fmod(pos, 1.f);
+    if (pos > 1.f)
+      pos = fmod(pos, 1.f);
     return op(pos);
   };
 }
 
 FloatOp Ops::rate(FloatOp op, float rateOffset) {
-  return [op, rateOffset](float pos) { 
+  return [op, rateOffset](float pos) {
     pos = pos * rateOffset;
-    if(pos > 1.f) pos = fmod(pos, 1.f);
+    if (pos > 1.f)
+      pos = fmod(pos, 1.f);
     return op(pos);
   };
 }
 
 FloatOp Ops::rate(FloatOp op, FloatOp rateOffset) {
-  return [op, rateOffset](float pos) { 
+  return [op, rateOffset](float pos) {
     pos = pos * rateOffset(pos);
-    if(pos > 1.f) pos = fmod(pos, 1.f);
+    if (pos > 1.f)
+      pos = fmod(pos, 1.f);
     return op(pos);
   };
 }
 
 FloatOp Ops::ring(FloatOp opA, FloatOp opB) {
-  return [opA, opB](float pos) { 
+  return [opA, opB](float pos) {
     float a = opA(pos);
     float b = opB(pos);
     return a * b;
@@ -292,7 +294,7 @@ FloatOp Ops::ring(FloatOp opA, FloatOp opB) {
 }
 
 FloatOp Ops::fold(FloatOp op, FloatOp threshold) {
-  return [op, threshold](float pos) { 
+  return [op, threshold](float pos) {
     float val = op(pos);
     float thresh = threshold(pos);
     while (val > thresh) {
@@ -303,7 +305,7 @@ FloatOp Ops::fold(FloatOp op, FloatOp threshold) {
 }
 
 FloatOp Ops::fold(FloatOp op, float threshold) {
-  return [op, threshold](float pos) { 
+  return [op, threshold](float pos) {
     float val = op(pos);
     while (val > threshold) {
       val = threshold - (val - threshold);
@@ -313,7 +315,7 @@ FloatOp Ops::fold(FloatOp op, float threshold) {
 }
 
 FloatOp Ops::fold(FloatOp op) {
-  return [op](float pos) { 
+  return [op](float pos) {
     float val = op(pos);
     while (val > 1.f) {
       val = 1.f - (val - 1.f);
@@ -323,7 +325,7 @@ FloatOp Ops::fold(FloatOp op) {
 }
 
 FloatOp Ops::lowPassFilter(FloatOp inputOp, int windowSize) {
-  return [inputOp, windowSize](float pos) { 
+  return [inputOp, windowSize](float pos) {
     float sum = 0.f;
     for (int i = 0; i < windowSize; ++i) {
       float offsetPos = pos - (static_cast<float>(i) / windowSize);
@@ -335,7 +337,7 @@ FloatOp Ops::lowPassFilter(FloatOp inputOp, int windowSize) {
 }
 
 FloatOp Ops::chain(vector<FloatOp> ops) {
-  return [ops](float pos) { 
+  return [ops](float pos) {
     float val = pos;
     for (auto op : ops) {
       val = op(val);
@@ -345,34 +347,35 @@ FloatOp Ops::chain(vector<FloatOp> ops) {
 }
 
 FloatOp Ops::choose(vector<FloatOp> ops) {
-  return [ops](float pos) { 
+  return [ops](float pos) {
     int index = static_cast<int>(ofRandom(ops.size()));
     return ops[index](pos);
   };
 }
 
 vector<float> Ops::normalize(vector<float> values) {
-    // Find min and max using std::min_element and std::max_element
-    auto minMax = std::minmax_element(values.begin(), values.end());
-    float min = *minMax.first;
-    float max = *minMax.second;
+  // Find min and max using std::min_element and std::max_element
+  auto minMax = std::minmax_element(values.begin(), values.end());
+  float min = *minMax.first;
+  float max = *minMax.second;
 
-    // Normalize the values
-    std::vector<float> normValues;
-    normValues.reserve(values.size());
-    for (float v : values) {
-        normValues.push_back((v - min) / (max - min));
-    }
+  // Normalize the values
+  std::vector<float> normValues;
+  normValues.reserve(values.size());
+  for (float v : values) {
+    normValues.push_back((v - min) / (max - min));
+  }
 
-    return normValues;
+  return normValues;
 }
 
 FloatOp Ops::timeseries(vector<float> yValues) {
   vector<float> normValues = normalize(yValues);
-  return [normValues](float pos) { 
+  return [normValues](float pos) {
     int index = static_cast<int>(pos * (normValues.size() - 1));
     float fraction = pos * (normValues.size() - 1) - index;
-    return (normValues[index] * (1.f - fraction)) + (normValues[index + 1] * fraction);
+    return (normValues[index] * (1.f - fraction)) +
+           (normValues[index + 1] * fraction);
   };
 }
 
@@ -392,13 +395,14 @@ vector<float> Ops::floatArray(FloatOp op, int numSamples, FloatOp mapOp) {
   return mappedTable;
 }
 
-vector<glm::vec2> Ops::glv2Array(FloatOp curve, float start, float end, int numPoints, float yScale) {
+vector<glm::vec2> Ops::glv2Array(FloatOp curve, float start, float end,
+                                 int numPoints, float yScale) {
   vector<glm::vec2> points(numPoints);
   float step = (end - start) / numPoints;
   end = end - (step - 1);
   for (int i = 0; i < numPoints; ++i) {
     float x = start + (i * step);
-    float y = curve(x/end);
+    float y = curve(x / end);
     points[i] = glm::vec2(x, ofGetHeight() - (y * yScale));
   }
   return points;

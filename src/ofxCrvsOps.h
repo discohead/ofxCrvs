@@ -142,7 +142,8 @@ public:
   FloatOp timeseries(vector<float> yValues);
 
   vector<float> floatArray(FloatOp op, int numSamples, FloatOp mapOp = nullptr);
-  vector<glm::vec2> glv2Array(FloatOp curve, float start, float end, int numPoints, float yScale = 1.0f);
+  vector<glm::vec2> glv2Array(FloatOp curve, float start, float end,
+                              int numPoints, float yScale = 1.0f);
 
   float triDist(float lo, float hi, float mode);
   float pNoise(float x, float y, float z, float falloff = 1.f, int octaves = 1);
@@ -152,7 +153,8 @@ public:
   vector<float> table;
   FloatOp wavetable();
 
-  void plot(FloatOp op, float yScale, ofColor color = ofColor::white, bool fill = false);
+  void plot(FloatOp op, float yScale, ofColor color = ofColor::white,
+            bool fill = false);
 
 private:
   ofBaseApp *app = ofGetAppPtr();
