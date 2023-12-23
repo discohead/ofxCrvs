@@ -16,10 +16,9 @@ namespace ofxCrvs {
 
 class Window : public ofRectangle {
 public:
-    using ofRectangle::ofRectangle;
-    
-    glm::vec2 apply(glm::vec2 v);
-    
+  using ofRectangle::ofRectangle;
+
+  glm::vec2 apply(glm::vec2 v);
 };
 
 } // namespace ofxCrvs
