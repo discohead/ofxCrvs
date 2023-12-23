@@ -158,7 +158,6 @@ public:
   std::vector<Edg> getWebEdgs(int numPoints, bool windowed, bool transformed);
 
 protected:
-  ofBaseApp *app = ofGetAppPtr();
   float calculate(float pos);
   float ampBias(float value, float pos);
   float calcPos(float pos);

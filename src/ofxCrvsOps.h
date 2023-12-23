@@ -155,8 +155,5 @@ public:
 
   void plot(FloatOp op, float yScale, ofColor color = ofColor::white,
             bool fill = false);
-
-private:
-  ofBaseApp *app = ofGetAppPtr();
 };
 } // namespace ofxCrvs
