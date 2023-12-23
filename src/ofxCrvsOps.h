@@ -144,6 +144,12 @@ public:
   vector<float> floatArray(FloatOp op, int numSamples, FloatOp mapOp = nullptr);
   vector<glm::vec2> glv2Array(FloatOp curve, float start, float end,
                               int numPoints, float yScale = 1.0f);
+  vector<glm::vec3> glv3Array(FloatOp curve, float start, float end,
+                              int numPoints, float yScale = 1.0f);
+  vector<ofVec2f> ofv2Array(FloatOp curve, float start, float end,
+                            int numPoints, float yScale = 1.0f);
+  vector<ofVec3f> ofv3Array(FloatOp curve, float start, float end,
+                            int numPoints, float yScale = 1.0f);
 
   float triDist(float lo, float hi, float mode);
   float pNoise(float x, float y, float z, float falloff = 1.f, int octaves = 1);

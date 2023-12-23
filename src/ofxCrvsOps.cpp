@@ -408,6 +408,45 @@ vector<glm::vec2> Ops::glv2Array(FloatOp curve, float start, float end,
   return points;
 }
 
+vector<glm::vec3> Ops::glv3Array(FloatOp curve, float start, float end,
+                                 int numPoints, float yScale) {
+  vector<glm::vec3> points(numPoints);
+  float step = (end - start) / numPoints;
+  end = end - (step - 1);
+  for (int i = 0; i < numPoints; ++i) {
+    float x = start + (i * step);
+    float y = curve(x / end);
+    points[i] = glm::vec3(x, ofGetHeight() - (y * yScale), 0.f);
+  }
+  return points;
+}
+
+vector<ofVec2f> Ops::ofv2Array(FloatOp curve, float start, float end,
+                               int numPoints, float yScale) {
+  vector<ofVec2f> points(numPoints);
+  float step = (end - start) / numPoints;
+  end = end - (step - 1);
+  for (int i = 0; i < numPoints; ++i) {
+    float x = start + (i * step);
+    float y = curve(x / end);
+    points[i] = ofVec2f(x, ofGetHeight() - (y * yScale));
+  }
+  return points;
+}
+
+vector<ofVec3f> Ops::ofv3Array(FloatOp curve, float start, float end,
+                               int numPoints, float yScale) {
+  vector<ofVec3f> points(numPoints);
+  float step = (end - start) / numPoints;
+  end = end - (step - 1);
+  for (int i = 0; i < numPoints; ++i) {
+    float x = start + (i * step);
+    float y = curve(x / end);
+    points[i] = ofVec3f(x, ofGetHeight() - (y * yScale), 0.f);
+  }
+  return points;
+}
+
 float Ops::triDist(float lo, float hi, float mode) {
   float F = (mode - lo) / (hi - lo);
   float rand = ofRandom(1.f);
