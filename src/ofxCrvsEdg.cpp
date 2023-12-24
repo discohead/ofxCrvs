@@ -26,8 +26,10 @@ glm::vec3 Edg::at(float pos) const {
 glm::vec3 Edg::midpoint() const { return at(0.5); }
 
 void Edg::transformed() {
-  Utils::transform(source, midpoint(), scale, translation, rotation, Utils::zAxis);
-  Utils::transform(target, midpoint(), scale, translation, rotation, Utils::zAxis);
+  Utils::transform(source, midpoint(), scale, translation, rotation,
+                   Utils::zAxis);
+  Utils::transform(target, midpoint(), scale, translation, rotation,
+                   Utils::zAxis);
 }
 
 std::vector<glm::vec3> Edg::points() const { return points(resolution); }

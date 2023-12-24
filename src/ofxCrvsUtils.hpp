@@ -23,14 +23,14 @@ class Utils {
   static constexpr glm::vec3 zAxis = glm::vec3(0.f, 0.f, 1.f);
 
   static void transform(glm::vec3& vector, const glm::vec3& center,
-                             const glm::vec3& scale, const glm::vec3& translation,
-                             float rotationDegrees,
-                             const glm::vec3& rotationAxis = Utils::zAxis);
+                        const glm::vec3& scale, const glm::vec3& translation,
+                        float rotationDegrees,
+                        const glm::vec3& rotationAxis = Utils::zAxis);
 
-  static void transform(
-      std::vector<glm::vec3> vectors, const glm::vec3& center, const glm::vec3& scale,
-      const glm::vec3& translation, float rotationDegrees,
-      const glm::vec3& rotationAxis = Utils::zAxis);
+  static void transform(std::vector<glm::vec3> vectors, const glm::vec3& center,
+                        const glm::vec3& scale, const glm::vec3& translation,
+                        float rotationDegrees,
+                        const glm::vec3& rotationAxis = Utils::zAxis);
 
   static void clipped(glm::vec3& point, const ofBoxPrimitive& box);
 
