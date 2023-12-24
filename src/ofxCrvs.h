@@ -6,3 +6,4 @@
 #include "ofxCrvsOps.h"
 #include "ofxCrvsUtils.hpp"
 #include "ofxCrvsWindow.hpp"
+#include "ofxCrvsCloudOps.h"

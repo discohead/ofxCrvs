@@ -23,8 +23,8 @@ class Lsjs : public Crv {
 public:
   std::shared_ptr<Crv> xCrv;
   std::shared_ptr<Crv> yCrv;
-
-  Lsjs() : Crv() {}
+  using Crv::Crv;
+  
   Lsjs(std::shared_ptr<Crv> xCrv, std::shared_ptr<Crv> yCrv)
       : Crv(), xCrv(xCrv), yCrv(yCrv){};
   Lsjs(Window window, std::shared_ptr<Crv> xCrv, std::shared_ptr<Crv> yCrv)
