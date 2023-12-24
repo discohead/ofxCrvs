@@ -15,18 +15,20 @@
 namespace ofxCrvs {
 
 class Utils {
-public:
-  static glm::vec2 transform(glm::vec2 vector, glm::vec2 center,
-                             glm::vec2 scale, glm::vec2 translation,
+ public:
+  static glm::vec3 transform(glm::vec3 vector, glm::vec3 center,
+                             glm::vec3 scale, glm::vec3 translation,
                              float rotationDegrees);
-  static std::vector<glm::vec2> transform(std::vector<glm::vec2> vector,
-                                          glm::vec2 center, glm::vec2 scale,
-                                          glm::vec2 translation,
+  static std::vector<glm::vec3> transform(std::vector<glm::vec3> vector,
+                                          glm::vec3 center, glm::vec3 scale,
+                                          glm::vec3 translation,
                                           float rotationDegrees);
-  static glm::vec2 clipped(glm::vec2 vector, float xMin, float xMax, float yMin,
-                           float yMax);
+
+  static glm::vec3 clipped(const glm::vec3& point, const ofBoxPrimitive& box);
+
+  static glm::vec3 rotateVector(const glm::vec3& vec, float angleDegrees);
 };
 
-} // namespace ofxCrvs
+}  // namespace ofxCrvs
 
 #endif /* ofxCrvsUtils_hpp */

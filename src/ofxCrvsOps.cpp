@@ -36,8 +36,7 @@ FloatOp Ops::saw() {
 FloatOp Ops::tri(FloatOp s) {
   return [s](float pos) {
     float sValue = 0.5f;
-    if (s)
-      sValue = s(pos);
+    if (s) sValue = s(pos);
     return pos < sValue ? pos / sValue
                         : 1.f - ((pos - sValue) / (1.f - sValue));
   };
@@ -106,8 +105,7 @@ FloatOp Ops::tan(float fb) { return tan(c(fb)); }
 FloatOp Ops::pulse(FloatOp w) {
   return [w](float pos) {
     float wValue = 0.5f;
-    if (w)
-      wValue = w(pos);
+    if (w) wValue = w(pos);
     return pos < wValue ? 0.f : 1.f;
   };
 }
@@ -121,8 +119,7 @@ FloatOp Ops::square() { return pulse(); }
 FloatOp Ops::easeIn(FloatOp e) {
   return [e](float pos) {
     float eValue = 2.f;
-    if (e)
-      eValue = e(pos);
+    if (e) eValue = e(pos);
     return std::pow(pos, eValue);
   };
 }
@@ -134,8 +131,7 @@ FloatOp Ops::easeIn(float e) { return easeIn(c(e)); }
 FloatOp Ops::easeOut(FloatOp e) {
   return [e](float pos) {
     float eValue = 3.f;
-    if (e)
-      eValue = e(pos);
+    if (e) eValue = e(pos);
     return 1.f - std::pow((1.f - pos), eValue);
   };
 }
@@ -148,8 +144,7 @@ FloatOp Ops::easeInOut(FloatOp e) {
   return [e](float pos) {
     float value = pos * 2.f;
     float eValue = 3.f;
-    if (e)
-      eValue = e(pos);
+    if (e) eValue = e(pos);
     if (value > 1.f) {
       return 0.5f * std::pow(value, eValue);
     } else {
@@ -166,8 +161,7 @@ FloatOp Ops::easeOutIn(FloatOp e) {
   return [e](float pos) {
     float value = pos * 2.f;
     float eValue = 3.f;
-    if (e)
-      eValue = e(pos);
+    if (e) eValue = e(pos);
     if (value < 1.f) {
       return (1.f - std::pow((1.f - value), eValue) * 0.5f) - 0.5f;
     } else {
@@ -222,16 +216,12 @@ FloatOp Ops::perlin(FloatOp x, FloatOp y, FloatOp z, FloatOp falloff,
   return [x, y, z, falloff, octaves, this](float pos) {
     int lod = 1;
     float fof = 1.f;
-    if (falloff)
-      fof = falloff(pos);
-    if (octaves)
-      lod = octaves(pos);
+    if (falloff) fof = falloff(pos);
+    if (octaves) lod = octaves(pos);
     float xVal = x(pos);
-    if (!y)
-      return pNoise(xVal, fof, lod);
+    if (!y) return pNoise(xVal, fof, lod);
     float yVal = y(pos);
-    if (!z)
-      return pNoise(xVal, yVal, fof, lod);
+    if (!z) return pNoise(xVal, yVal, fof, lod);
     float zVal = z(pos);
     return pNoise(xVal, yVal, zVal, fof, lod);
   };
@@ -252,8 +242,7 @@ FloatOp Ops::bias(FloatOp op, FloatOp offset) {
 FloatOp Ops::phase(FloatOp op, float phaseOffset) {
   return [op, phaseOffset](float pos) {
     pos = pos + phaseOffset;
-    if (pos > 1.f)
-      pos = fmod(pos, 1.f);
+    if (pos > 1.f) pos = fmod(pos, 1.f);
     return op(pos);
   };
 }
@@ -261,8 +250,7 @@ FloatOp Ops::phase(FloatOp op, float phaseOffset) {
 FloatOp Ops::phase(FloatOp op, FloatOp phaseOffset) {
   return [op, phaseOffset](float pos) {
     pos = pos + phaseOffset(pos);
-    if (pos > 1.f)
-      pos = fmod(pos, 1.f);
+    if (pos > 1.f) pos = fmod(pos, 1.f);
     return op(pos);
   };
 }
@@ -270,8 +258,7 @@ FloatOp Ops::phase(FloatOp op, FloatOp phaseOffset) {
 FloatOp Ops::rate(FloatOp op, float rateOffset) {
   return [op, rateOffset](float pos) {
     pos = pos * rateOffset;
-    if (pos > 1.f)
-      pos = fmod(pos, 1.f);
+    if (pos > 1.f) pos = fmod(pos, 1.f);
     return op(pos);
   };
 }
@@ -279,8 +266,7 @@ FloatOp Ops::rate(FloatOp op, float rateOffset) {
 FloatOp Ops::rate(FloatOp op, FloatOp rateOffset) {
   return [op, rateOffset](float pos) {
     pos = pos * rateOffset(pos);
-    if (pos > 1.f)
-      pos = fmod(pos, 1.f);
+    if (pos > 1.f) pos = fmod(pos, 1.f);
     return op(pos);
   };
 }
@@ -386,8 +372,7 @@ vector<float> Ops::floatArray(FloatOp op, int numSamples, FloatOp mapOp) {
     float pos = i * step;
     table[i] = op(pos / numSamples);
   }
-  if (!mapOp)
-    return table;
+  if (!mapOp) return table;
   vector<float> mappedTable(numSamples);
   for (int i = 0; i < numSamples; ++i) {
     mappedTable[i] = mapOp(table[i]);
@@ -461,7 +446,7 @@ float Ops::pNoise(float x, float y, float z, float falloff, int octaves) {
   float amplitude = 1.0f;
   float frequency = 1.0f;
   float total = 0.0f;
-  float maxAmplitude = 0.0f; // Used for normalizing result to 0.0 - 1.0
+  float maxAmplitude = 0.0f;  // Used for normalizing result to 0.0 - 1.0
 
   for (int i = 0; i < octaves; i++) {
     total += ofNoise(x * frequency, y * frequency, z * frequency) * amplitude;
@@ -478,7 +463,7 @@ float Ops::pNoise(float x, float y, float falloff, int octaves) {
   float amplitude = 1.0f;
   float frequency = 1.0f;
   float total = 0.0f;
-  float maxAmplitude = 0.0f; // Used for normalizing result to 0.0 - 1.0
+  float maxAmplitude = 0.0f;  // Used for normalizing result to 0.0 - 1.0
 
   for (int i = 0; i < octaves; i++) {
     total += ofNoise(x * frequency, y * frequency) * amplitude;
@@ -495,7 +480,7 @@ float Ops::pNoise(float x, float falloff, int octaves) {
   float amplitude = 1.0f;
   float frequency = 1.0f;
   float total = 0.0f;
-  float maxAmplitude = 0.0f; // Used for normalizing result to 0.0 - 1.0
+  float maxAmplitude = 0.0f;  // Used for normalizing result to 0.0 - 1.0
 
   for (int i = 0; i < octaves; i++) {
     total += ofNoise(x * frequency) * amplitude;
@@ -526,4 +511,4 @@ void Ops::plot(FloatOp op, float yScale, ofColor color, bool fill) {
   ofPopStyle();
 }
 
-} // namespace ofxCrvs
+}  // namespace ofxCrvs

@@ -20,19 +20,19 @@ namespace ofxCrvs {
 using VctrOp = std::function<glm::vec2(glm::vec2)>;
 
 class Lsjs : public Crv {
-public:
+ public:
   std::shared_ptr<Crv> xCrv;
   std::shared_ptr<Crv> yCrv;
   using Crv::Crv;
-  
+
   Lsjs(std::shared_ptr<Crv> xCrv, std::shared_ptr<Crv> yCrv)
       : Crv(), xCrv(xCrv), yCrv(yCrv){};
-  Lsjs(Window window, std::shared_ptr<Crv> xCrv, std::shared_ptr<Crv> yCrv)
-      : Crv(window), xCrv(xCrv), yCrv(yCrv){};
+  Lsjs(Box box, std::shared_ptr<Crv> xCrv, std::shared_ptr<Crv> yCrv)
+      : Crv(box), xCrv(xCrv), yCrv(yCrv){};
 
   float componentAt(Component c, float pos);
 };
 
-} // namespace ofxCrvs
+}  // namespace ofxCrvs
 
 #endif /* ofxCrvsLsjs_hpp */

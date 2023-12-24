@@ -17,38 +17,46 @@ namespace ofxCrvs {
 class Crv;
 
 class Edg {
-public:
-  Edg(glm::vec2 source, glm::vec2 target, int resolution)
-      : source(source), target(target), resolution(resolution),
-        translation(glm::vec2(0)), scale(glm::vec2(1)), rotation(0){};
+ public:
+  Edg(glm::vec3 source, glm::vec3 target, int resolution)
+      : source(source),
+        target(target),
+        resolution(resolution),
+        translation(glm::vec3(0)),
+        scale(glm::vec3(1)),
+        rotation(0){};
 
-  Edg(glm::vec2 source, glm::vec2 target, int resolution, glm::vec2 translation,
-      glm::vec2 scale, float rotation)
-      : source(source), target(target), resolution(resolution),
-        translation(translation), scale(scale), rotation(rotation){};
+  Edg(glm::vec3 source, glm::vec3 target, int resolution, glm::vec3 translation,
+      glm::vec3 scale, float rotation)
+      : source(source),
+        target(target),
+        resolution(resolution),
+        translation(translation),
+        scale(scale),
+        rotation(rotation){};
 
-  glm::vec2 source;
-  glm::vec2 target;
+  glm::vec3 source;
+  glm::vec3 target;
 
   int resolution;
-  glm::vec2 translation;
-  glm::vec2 scale;
+  glm::vec3 translation;
+  glm::vec3 scale;
 
   float rotation;
 
   float length();
-  glm::vec2 at(float pos);
-  glm::vec2 midpoint();
+  glm::vec3 at(float pos);
+  glm::vec3 midpoint();
   Edg transformed();
-  std::vector<glm::vec2> points();
-  std::vector<glm::vec2> points(int numPoints);
+  std::vector<glm::vec3> points();
+  std::vector<glm::vec3> points(int numPoints);
   float angle();
-  glm::vec2 getPerpendicularPoint(glm::vec2 point, float magnitude);
-  std::vector<glm::vec2> getCrvPoints(Crv crv, int resolution);
-  std::vector<glm::vec2> getCrvPoints(Crv crv);
-  glm::vec2 asVector();
+  glm::vec3 getPerpendicularPoint(glm::vec3 point, float magnitude);
+  std::vector<glm::vec3> getCrvPoints(Crv crv, int resolution);
+  std::vector<glm::vec3> getCrvPoints(Crv crv);
+  glm::vec3 asVector();
 };
 
-} // namespace ofxCrvs
+}  // namespace ofxCrvs
 
 #endif /* ofxCrvsEdg_hpp */

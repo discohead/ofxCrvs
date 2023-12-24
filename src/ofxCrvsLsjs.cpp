@@ -13,15 +13,15 @@ float Lsjs::componentAt(Component c, float pos) {
   pos = calcPos(pos);
   float value;
   if (c == Component::X) {
-    glm::vec2 xV = this->xCrv->uVector(pos, true);
+    glm::vec3 xV = this->xCrv->uVector(pos, true);
     value = xV.y;
-  } else {
-    glm::vec2 yV = this->yCrv->uVector(pos, true);
+  } else if (c == Component::Y) {
+    glm::vec3 yV = this->yCrv->uVector(pos, true);
     value = quantize(yV.y);
+  } else {
+    return 0.f;
   }
-  value = bipolarize(value);
-  value = ampBias(value, pos);
   return value;
 }
 
-} // namespace ofxCrvs
+}  // namespace ofxCrvs

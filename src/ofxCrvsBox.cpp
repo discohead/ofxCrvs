@@ -5,17 +5,19 @@
 //  Created by Jared McFarland on 12/21/23.
 //
 
-#include "ofxCrvsWindow.hpp"
+#include "ofxCrvsBox.hpp"
+
 #include "ofxCrvsUtils.hpp"
 
 namespace ofxCrvs {
 
-glm::vec2 Window::apply(glm::vec2 v) {
+glm::vec3 Box::apply(glm::vec3 v) {
   v.x *= (getWidth() - 1);
   v.y *= (getHeight() - 1);
-  glm::vec2 origin = getTopLeft();
+  v.z *= (getDepth() - 1);
+  glm::vec3 origin = getPosition();
   v += origin;
-  return Utils::clipped(v, getMinX(), getMaxX(), getMinY(), getMaxY());
+  return Utils::clipped(v, *this);
 }
 
-} // namespace ofxCrvs
+}  // namespace ofxCrvs

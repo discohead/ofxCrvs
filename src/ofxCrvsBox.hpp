@@ -14,12 +14,12 @@
 
 namespace ofxCrvs {
 
-class Window : public ofRectangle {
-public:
-  using ofRectangle::ofRectangle;
+class Box : public ofBoxPrimitive {
+ public:
+  using ofBoxPrimitive::ofBoxPrimitive;
 
-  glm::vec2 apply(glm::vec2 v);
+  glm::vec3 apply(glm::vec3 v);
 };
 
-} // namespace ofxCrvs
+}  // namespace ofxCrvs
 #endif /* ofxCrvsWindow_hpp */

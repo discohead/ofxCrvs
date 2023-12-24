@@ -1,15 +1,16 @@
 
 #pragma once
 
-#include "ofMain.h"
 #include <functional>
+
+#include "ofMain.h"
 
 namespace ofxCrvs {
 
 using FloatOp = std::function<float(float)>;
 
 class Ops {
-public:
+ public:
   Ops() {
     table.resize(1024);
     for (int i = 0; i < 1024; i++) {
@@ -162,4 +163,4 @@ public:
   void plot(FloatOp op, float yScale, ofColor color = ofColor::white,
             bool fill = false);
 };
-} // namespace ofxCrvs
+}  // namespace ofxCrvs
