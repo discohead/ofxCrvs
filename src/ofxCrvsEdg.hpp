@@ -44,17 +44,17 @@ class Edg {
 
   float rotation;
 
-  float length();
-  glm::vec3 at(float pos);
-  glm::vec3 midpoint();
-  Edg transformed();
-  std::vector<glm::vec3> points();
-  std::vector<glm::vec3> points(int numPoints);
-  float angle();
-  glm::vec3 getPerpendicularPoint(glm::vec3 point, float magnitude);
-  std::vector<glm::vec3> getCrvPoints(Crv crv, int resolution);
-  std::vector<glm::vec3> getCrvPoints(Crv crv);
-  glm::vec3 asVector();
+  float length() const;
+  glm::vec3 at(float pos) const;
+  glm::vec3 midpoint() const;
+  void transformed();
+  std::vector<glm::vec3> points() const;
+  std::vector<glm::vec3> points(int numPoints) const;
+  float angle() const;
+  glm::vec3 getPerpendicularPoint(glm::vec3 point, float magnitude) const;
+  std::vector<glm::vec3> getCrvPoints(Crv crv, int resolution) const;
+  std::vector<glm::vec3> getCrvPoints(Crv crv) const;
+  glm::vec3 asVector() const;
 };
 
 }  // namespace ofxCrvs

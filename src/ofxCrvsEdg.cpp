@@ -12,9 +12,9 @@
 
 namespace ofxCrvs {
 
-float Edg::length() { return glm::distance(source, target); }
+float Edg::length() const { return glm::distance(source, target); }
 
-glm::vec3 Edg::at(float pos) {
+glm::vec3 Edg::at(float pos) const {
   glm::vec3 point;
   point.x = ofMap(pos, 0, 1, source.x, target.x);
   point.y = ofMap(pos, 0, 1, source.y, target.y);
@@ -23,19 +23,16 @@ glm::vec3 Edg::at(float pos) {
   return point;
 }
 
-glm::vec3 Edg::midpoint() { return at(0.5); }
+glm::vec3 Edg::midpoint() const { return at(0.5); }
 
-Edg Edg::transformed() {
-  glm::vec3 transformedSource =
-      Utils::transform(source, midpoint(), scale, translation, rotation);
-  glm::vec3 transformedTarget =
-      Utils::transform(target, midpoint(), scale, translation, rotation);
-  return Edg(transformedSource, transformedTarget, resolution);
+void Edg::transformed() {
+  Utils::transform(source, midpoint(), scale, translation, rotation, Utils::zAxis);
+  Utils::transform(target, midpoint(), scale, translation, rotation, Utils::zAxis);
 }
 
-std::vector<glm::vec3> Edg::points() { return points(resolution); }
+std::vector<glm::vec3> Edg::points() const { return points(resolution); }
 
-std::vector<glm::vec3> Edg::points(int numPoints) {
+std::vector<glm::vec3> Edg::points(int numPoints) const {
   std::vector<glm::vec3> points;
   for (int i = 0; i < numPoints; ++i) {
     points.push_back(at((float)i / (float)numPoints));
@@ -43,11 +40,11 @@ std::vector<glm::vec3> Edg::points(int numPoints) {
   return points;
 }
 
-float Edg::angle() {
+float Edg::angle() const {
   return glm::atan(target.y - source.y, target.x - source.x);
 }
 
-glm::vec3 Edg::getPerpendicularPoint(glm::vec3 point, float magnitude) {
+glm::vec3 Edg::getPerpendicularPoint(glm::vec3 point, float magnitude) const {
   glm::vec3 dir = this->asVector();
   dir = glm::normalize(dir);
 
@@ -69,7 +66,7 @@ glm::vec3 Edg::getPerpendicularPoint(glm::vec3 point, float magnitude) {
   return point + dir;
 }
 
-std::vector<glm::vec3> Edg::getCrvPoints(Crv crv, int resolution) {
+std::vector<glm::vec3> Edg::getCrvPoints(Crv crv, int resolution) const {
   std::vector<glm::vec3> edgPoints = points(resolution);
   std::vector<glm::vec3> crvPoints;
   for (int i = 0; i < resolution; ++i) {
@@ -80,10 +77,10 @@ std::vector<glm::vec3> Edg::getCrvPoints(Crv crv, int resolution) {
   return crvPoints;
 }
 
-std::vector<glm::vec3> Edg::getCrvPoints(Crv crv) {
+std::vector<glm::vec3> Edg::getCrvPoints(Crv crv) const {
   return getCrvPoints(crv, resolution);
 }
 
-glm::vec3 Edg::asVector() { return target - source; }
+glm::vec3 Edg::asVector() const { return target - source; }
 
 }  // namespace ofxCrvs

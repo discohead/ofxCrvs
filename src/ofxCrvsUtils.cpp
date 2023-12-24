@@ -11,41 +11,37 @@
 
 namespace ofxCrvs {
 
-glm::vec3 Utils::transform(glm::vec3 vector, glm::vec3 center, glm::vec3 scale,
-                           glm::vec3 translation, float rotationDegrees) {
+void Utils::transform(glm::vec3& vector, const glm::vec3& center,
+                      const glm::vec3& scale, const glm::vec3& translation,
+                      float rotationDegrees, const glm::vec3& rotationAxis) {
   if (rotationDegrees != 0.f) {
     vector -= center;
-    vector = rotateVector(vector, rotationDegrees);
+    vector = glm::rotate(vector, glm::radians(rotationDegrees), rotationAxis);
     vector += center;
   }
 
-  if (scale != glm::vec3(1.f)) {
+  if (scale != Utils::noScale) {
     vector.x *= scale.x;
     vector.y *= scale.y;
     vector.z *= scale.z;
   }
 
-  if (translation != glm::vec3(0.f)) {
+  if (translation != Utils::noTranslation) {
     vector += translation;
   }
-  return vector;
 }
 
-std::vector<glm::vec3> Utils::transform(std::vector<glm::vec3> vector,
-                                        glm::vec3 center, glm::vec3 scale,
-                                        glm::vec3 translation,
-                                        float rotationDegrees) {
-  std::vector<glm::vec3> transformed;
-  for (auto& v : vector) {
-    glm::vec3 tV = transform(v, center, scale, translation, rotationDegrees);
-    transformed.push_back(tV);
+void Utils::transform(std::vector<glm::vec3> vectors, const glm::vec3& center,
+                      const glm::vec3& scale, const glm::vec3& translation,
+                      float rotationDegrees, const glm::vec3& rotationAxis) {
+  for (auto& v : vectors) {
+    transform(v, center, scale, translation, rotationDegrees, rotationAxis);
   }
-  return transformed;
 }
 
 // Utility function to rotate a vector by a given angle around its perpendicular
 // axis
-glm::vec3 Utils::rotateVector(const glm::vec3& vec, float angleDegrees) {
+void Utils::rotateVector(glm::vec3& vec, float angleDegrees) {
   // Convert angle to radians
   float angleRadians = glm::radians(angleDegrees);
 
@@ -63,10 +59,10 @@ glm::vec3 Utils::rotateVector(const glm::vec3& vec, float angleDegrees) {
   rotationAxis = glm::normalize(rotationAxis);
 
   // Rotate the vector
-  return glm::rotate(vec, angleRadians, rotationAxis);
+  vec = glm::rotate(vec, angleRadians, rotationAxis);
 }
 
-glm::vec3 Utils::clipped(const glm::vec3& point, const ofBoxPrimitive& box) {
+void Utils::clipped(glm::vec3& point, const ofBoxPrimitive& box) {
   glm::vec3 boxCenter = box.getPosition();
   float halfWidth = box.getWidth() * 0.5f;
   float halfHeight = box.getHeight() * 0.5f;
@@ -75,12 +71,9 @@ glm::vec3 Utils::clipped(const glm::vec3& point, const ofBoxPrimitive& box) {
   glm::vec3 minBound = boxCenter - glm::vec3(halfWidth, halfHeight, halfDepth);
   glm::vec3 maxBound = boxCenter + glm::vec3(halfWidth, halfHeight, halfDepth);
 
-  glm::vec3 clippedPoint;
-  clippedPoint.x = ofClamp(point.x, minBound.x, maxBound.x);
-  clippedPoint.y = ofClamp(point.y, minBound.y, maxBound.y);
-  clippedPoint.z = ofClamp(point.z, minBound.z, maxBound.z);
-
-  return clippedPoint;
+  point.x = ofClamp(point.x, minBound.x, maxBound.x);
+  point.y = ofClamp(point.y, minBound.y, maxBound.y);
+  point.z = ofClamp(point.z, minBound.z, maxBound.z);
 }
 
 }  // namespace ofxCrvs

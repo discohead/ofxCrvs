@@ -19,148 +19,150 @@ class Ops {
   };
   Ops(vector<float> table) : table(table){};
 
-  FloatOp zero() {
+  FloatOp zero() const {
     return [](float) { return 0.0f; };
   };
-  FloatOp fourth() {
+  FloatOp fourth() const {
     return [](float) { return 0.25f; };
   };
-  FloatOp third() {
+  FloatOp third() const {
     return [](float) { return 1.f / 3.f; };
   };
-  FloatOp half() {
+  FloatOp half() const {
     return [](float) { return 0.5f; };
   };
-  FloatOp one() {
+  FloatOp one() const {
     return [](float) { return 1.0f; };
   };
-  FloatOp two() {
+  FloatOp two() const {
     return [](float) { return 2.0f; };
   };
-  FloatOp three() {
+  FloatOp three() const {
     return [](float) { return 3.0f; };
   };
-  FloatOp four() {
+  FloatOp four() const {
     return [](float) { return 4.0f; };
   };
-  FloatOp quarterPi() {
+  FloatOp quarterPi() const {
     return [](float) { return glm::quarter_pi<float>(); };
   };
-  FloatOp thirdPi() {
+  FloatOp thirdPi() const {
     return [](float) { return glm::pi<float>() / 3.f; };
   };
-  FloatOp halfPi() {
+  FloatOp halfPi() const {
     return [](float) { return glm::half_pi<float>(); };
   };
-  FloatOp pi() {
+  FloatOp pi() const {
     return [](float) { return glm::pi<float>(); };
   };
-  FloatOp twoPi() {
+  FloatOp twoPi() const {
     return [](float) { return glm::two_pi<float>(); };
   };
-  FloatOp appWidth() {
+  FloatOp appWidth() const {
     return [](float) { return ofGetWidth(); };
   };
-  FloatOp appHeight() {
+  FloatOp appHeight() const {
     return [](float) { return ofGetHeight(); };
   };
-  FloatOp frameNum() {
+  FloatOp frameNum() const {
     return [](float) { return ofGetFrameNum(); };
   };
-  FloatOp mouseX() {
+  FloatOp mouseX() const {
     return [](float) { return ofGetMouseX(); };
   };
-  FloatOp mouseY() {
+  FloatOp mouseY() const {
     return [](float) { return ofGetMouseY(); };
   };
 
-  float pos2Rad(float pos);
-  FloatOp bipolarize(FloatOp unipolarOp);
-  FloatOp rectify(FloatOp bipolarOp);
-  FloatOp c(float value);
-  FloatOp phasor();
-  FloatOp saw();
-  FloatOp tri(FloatOp s);
-  FloatOp tri();
-  FloatOp tri(float s);
-  FloatOp sine(FloatOp fb);
-  FloatOp sine();
-  FloatOp sine(float fb);
-  FloatOp asin();
-  FloatOp cos(FloatOp fb);
-  FloatOp cos(float fb);
-  FloatOp cos();
-  FloatOp acos();
-  FloatOp tan(FloatOp fb);
-  FloatOp tan(float fb);
-  FloatOp tan();
-  FloatOp pulse(FloatOp w);
-  FloatOp pulse(float w);
-  FloatOp pulse();
-  FloatOp square();
+  static float pos2Rad(float pos);
+  FloatOp bipolarize(FloatOp unipolarOp) const;
+  FloatOp rectify(FloatOp bipolarOp) const;
+  FloatOp c(float value) const;
+  FloatOp phasor() const;
+  FloatOp saw() const;
+  FloatOp tri(FloatOp s) const;
+  FloatOp tri() const;
+  FloatOp tri(float s) const;
+  FloatOp sine(FloatOp fb) const;
+  FloatOp sine() const;
+  FloatOp sine(float fb) const;
+  FloatOp asin() const;
+  FloatOp cos(FloatOp fb) const;
+  FloatOp cos(float fb) const;
+  FloatOp cos() const;
+  FloatOp acos() const;
+  FloatOp tan(FloatOp fb) const;
+  FloatOp tan(float fb) const;
+  FloatOp tan() const;
+  FloatOp pulse(FloatOp w) const;
+  FloatOp pulse(float w) const;
+  FloatOp pulse() const;
+  FloatOp square() const;
 
-  FloatOp easeIn(FloatOp e);
-  FloatOp easeIn();
-  FloatOp easeIn(float e);
-  FloatOp easeOut(FloatOp e);
-  FloatOp easeOut();
-  FloatOp easeOut(float e);
-  FloatOp easeInOut(FloatOp e);
-  FloatOp easeInOut();
-  FloatOp easeInOut(float e);
-  FloatOp easeOutIn(FloatOp e);
-  FloatOp easeOutIn();
-  FloatOp easeOutIn(float e);
+  FloatOp easeIn(FloatOp e) const;
+  FloatOp easeIn() const;
+  FloatOp easeIn(float e) const;
+  FloatOp easeOut(FloatOp e) const;
+  FloatOp easeOut() const;
+  FloatOp easeOut(float e) const;
+  FloatOp easeInOut(FloatOp e) const;
+  FloatOp easeInOut() const;
+  FloatOp easeInOut(float e) const;
+  FloatOp easeOutIn(FloatOp e) const;
+  FloatOp easeOutIn() const;
+  FloatOp easeOutIn(float e) const;
 
-  FloatOp gaussian(FloatOp lo, FloatOp hi);
-  FloatOp gaussian(FloatOp hi) { return gaussian(nullptr, hi); };
-  FloatOp guassian(float hi) { return gaussian(c(hi)); };
-  FloatOp gaussian() { return gaussian(nullptr, nullptr); };
+  FloatOp gaussian(FloatOp lo, FloatOp hi) const;
+  FloatOp gaussian(FloatOp hi) const { return gaussian(nullptr, hi); };
+  FloatOp guassian(float hi) const { return gaussian(c(hi)); };
+  FloatOp gaussian() const { return gaussian(nullptr, nullptr); };
 
-  FloatOp random(FloatOp lo, FloatOp hi, FloatOp mode);
-  FloatOp random() { return random(nullptr, nullptr, nullptr); };
-  FloatOp random(FloatOp hi) { return random(nullptr, hi, nullptr); };
-  FloatOp random(float hi) { return random(c(hi)); };
+  FloatOp random(FloatOp lo, FloatOp hi, FloatOp mode) const;
+  FloatOp random() const { return random(nullptr, nullptr, nullptr); };
+  FloatOp random(FloatOp hi) const { return random(nullptr, hi, nullptr); };
+  FloatOp random(float hi) const { return random(c(hi)); };
   FloatOp perlin(FloatOp x, FloatOp y = nullptr, FloatOp z = nullptr,
-                 FloatOp falloff = nullptr, FloatOp octaves = nullptr);
+                 FloatOp falloff = nullptr, FloatOp octaves = nullptr) const;
 
-  FloatOp mult(FloatOp op, float scalar);
-  FloatOp bias(FloatOp op, float offset);
-  FloatOp bias(FloatOp op, FloatOp offset);
-  FloatOp phase(FloatOp op, float phaseOffset);
-  FloatOp phase(FloatOp op, FloatOp phaseOffset);
-  FloatOp rate(FloatOp op, float rateOffset);
-  FloatOp rate(FloatOp op, FloatOp rateOffset);
-  FloatOp ring(FloatOp opA, FloatOp opB);
-  FloatOp fold(FloatOp op, FloatOp threshold);
-  FloatOp fold(FloatOp op, float threshold);
-  FloatOp fold(FloatOp op);
-  FloatOp lpf(FloatOp inputOp, int windowSize);
-  FloatOp chain(vector<FloatOp> ops);
-  FloatOp choose(vector<FloatOp> ops);
+  FloatOp mult(FloatOp op, float scalar) const;
+  FloatOp bias(FloatOp op, float offset) const;
+  FloatOp bias(FloatOp op, FloatOp offset) const;
+  FloatOp phase(FloatOp op, float phaseOffset) const;
+  FloatOp phase(FloatOp op, FloatOp phaseOffset) const;
+  FloatOp rate(FloatOp op, float rateOffset) const;
+  FloatOp rate(FloatOp op, FloatOp rateOffset) const;
+  FloatOp ring(FloatOp opA, FloatOp opB) const;
+  FloatOp fold(FloatOp op, FloatOp threshold) const;
+  FloatOp fold(FloatOp op, float threshold) const;
+  FloatOp fold(FloatOp op) const;
+  FloatOp lpf(FloatOp inputOp, int windowSize) const;
+  FloatOp chain(vector<FloatOp> ops) const;
+  FloatOp choose(vector<FloatOp> ops) const;
 
-  vector<float> normalize(vector<float> values);
-  FloatOp timeseries(vector<float> yValues);
+  vector<float> normalize(vector<float> values) const;
+  FloatOp timeseries(vector<float> yValues) const;
 
-  vector<float> floatArray(FloatOp op, int numSamples, FloatOp mapOp = nullptr);
+  vector<float> floatArray(FloatOp op, int numSamples,
+                           FloatOp mapOp = nullptr) const;
   vector<glm::vec2> glv2Array(FloatOp curve, float start, float end,
-                              int numPoints, float yScale = 1.0f);
+                              int numPoints, float yScale = 1.0f) const;
   vector<glm::vec3> glv3Array(FloatOp curve, float start, float end,
-                              int numPoints, float yScale = 1.0f);
+                              int numPoints, float yScale = 1.0f) const;
   vector<ofVec2f> ofv2Array(FloatOp curve, float start, float end,
-                            int numPoints, float yScale = 1.0f);
+                            int numPoints, float yScale = 1.0f) const;
   vector<ofVec3f> ofv3Array(FloatOp curve, float start, float end,
-                            int numPoints, float yScale = 1.0f);
+                            int numPoints, float yScale = 1.0f) const;
 
-  float triDist(float lo, float hi, float mode);
-  float pNoise(float x, float y, float z, float falloff = 1.f, int octaves = 1);
-  float pNoise(float x, float y, float falloff = 1.f, int octaves = 1);
-  float pNoise(float x, float falloff = 1.f, int octaves = 1);
+  float triDist(float lo, float hi, float mode) const;
+  float pNoise(float x, float y, float z, float falloff = 1.f,
+               int octaves = 1) const;
+  float pNoise(float x, float y, float falloff = 1.f, int octaves = 1) const;
+  float pNoise(float x, float falloff = 1.f, int octaves = 1) const;
 
   vector<float> table;
-  FloatOp wavetable();
+  FloatOp wavetable() const;
 
   void plot(FloatOp op, float yScale, ofColor color = ofColor::white,
-            bool fill = false);
+            bool fill = false) const;
 };
 }  // namespace ofxCrvs

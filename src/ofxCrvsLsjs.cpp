@@ -9,7 +9,7 @@
 
 namespace ofxCrvs {
 
-float Lsjs::componentAt(Component c, float pos) {
+float Lsjs::componentAt(Component c, float pos) const {
   pos = calcPos(pos);
   float value;
   if (c == Component::X) {

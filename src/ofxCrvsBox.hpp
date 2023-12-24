@@ -18,7 +18,7 @@ class Box : public ofBoxPrimitive {
  public:
   using ofBoxPrimitive::ofBoxPrimitive;
 
-  glm::vec3 apply(glm::vec3 v);
+  void apply(glm::vec3& v) const;
 };
 
 }  // namespace ofxCrvs

@@ -2,6 +2,7 @@
 
 #include "ofxCrvsBox.hpp"
 #include "ofxCrvsCloudOps.h"
+#include "ofxCrvsConstants.h"
 #include "ofxCrvsCrv.h"
 #include "ofxCrvsEdg.hpp"
 #include "ofxCrvsLsjs.hpp"

@@ -30,7 +30,7 @@ class Lsjs : public Crv {
   Lsjs(Box box, std::shared_ptr<Crv> xCrv, std::shared_ptr<Crv> yCrv)
       : Crv(box), xCrv(xCrv), yCrv(yCrv){};
 
-  float componentAt(Component c, float pos);
+  float componentAt(Component c, float pos) const;
 };
 
 }  // namespace ofxCrvs
