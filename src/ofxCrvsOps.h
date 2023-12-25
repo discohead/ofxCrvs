@@ -75,6 +75,7 @@ class Ops {
   };
 
   static float pos2Rad(float pos);
+  
   FloatOp bipolarize(FloatOp unipolarOp) const;
   FloatOp rectify(FloatOp bipolarOp) const;
   FloatOp c(float value) const;
@@ -94,10 +95,6 @@ class Ops {
   FloatOp tan(FloatOp fb) const;
   FloatOp tan(float fb) const;
   FloatOp tan() const;
-  FloatOp pulse(FloatOp w) const;
-  FloatOp pulse(float w) const;
-  FloatOp pulse() const;
-  FloatOp square() const;
 
   FloatOp easeIn(FloatOp e) const;
   FloatOp easeIn() const;
@@ -124,6 +121,9 @@ class Ops {
   FloatOp perlin(FloatOp x, FloatOp y = nullptr, FloatOp z = nullptr,
                  FloatOp falloff = nullptr, FloatOp octaves = nullptr) const;
 
+  // Basic ops
+  FloatOp abs(FloatOp op) const;
+  FloatOp diff(FloatOp opA, FloatOp opB) const;
   FloatOp mult(FloatOp op, float scalar) const;
   FloatOp bias(FloatOp op, float offset) const;
   FloatOp bias(FloatOp op, FloatOp offset) const;
@@ -137,6 +137,7 @@ class Ops {
   FloatOp fold(FloatOp op) const;
   FloatOp lpf(FloatOp inputOp, int windowSize) const;
 
+  // Vector Ops - accept arrays of FloatOps
   FloatOp chain(vector<FloatOp> ops) const;
   FloatOp choose(vector<FloatOp> ops) const;
   FloatOp mix(vector<FloatOp> ops) const;
@@ -149,9 +150,12 @@ class Ops {
   FloatOp median(vector<FloatOp> ops) const;
   FloatOp variance(vector<FloatOp> ops) const;
   FloatOp stdDev(vector<FloatOp> ops) const;
-  
-  FloatOp abs(FloatOp op) const;
-  FloatOp diff(FloatOp opA, FloatOp opB) const;
+
+  // Digital Ops - return 0 or 1
+  FloatOp pulse(FloatOp w) const;
+  FloatOp pulse(float w) const;
+  FloatOp pulse() const;
+  FloatOp square() const;
   FloatOp greater(FloatOp opA, FloatOp opB) const;
   FloatOp greater(FloatOp opA, float threshold) const;
   FloatOp less(FloatOp opA, FloatOp opB) const;
@@ -181,6 +185,7 @@ class Ops {
   FloatOp out(FloatOp op, FloatOp lo, FloatOp hi) const;
   FloatOp out(FloatOp op, float lo, FloatOp hi) const;
   FloatOp out(FloatOp op, FloatOp lo, float hi) const;
+  // End Digital Ops
 
   vector<float> normalize(vector<float> values) const;
   FloatOp timeseries(vector<float> yValues) const;
