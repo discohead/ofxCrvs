@@ -15,10 +15,10 @@ float Crv::apply(float pos) const { return calculate(pos); }
 
 float Crv::ampBias(float value, float pos) const {
   float ampFactor = ampOffset;
-  if (amp != nullptr) ampFactor *= amp->yAt(pos);
+  if (ampCrv != nullptr) ampFactor *= ampCrv->yAt(pos);
   ampFactor = ampFactor / 2.f;
   value = value * ampFactor + ampFactor;
-  if (bias != nullptr) value += bias->yAt(pos);
+  if (biasCrv != nullptr) value += biasCrv->yAt(pos);
   return value + biasOffset;
 }
 
@@ -26,8 +26,8 @@ float Crv::calcPos(float pos) const {
   pos = abs(pos);
   pos *= rateOffset;
   if (pos > 1.f) pos = fmod(pos, 1.f);
-  if (rate != nullptr) pos *= rate->yAt(pos);
-  if (phase != nullptr) pos += phase->yAt(pos);
+  if (rateCrv != nullptr) pos *= rateCrv->yAt(pos);
+  if (phaseCrv != nullptr) pos += phaseCrv->yAt(pos);
   pos += phaseOffset;
   if (pos > 1.f) pos = fmod(pos, 1.f);
   return pos;
@@ -232,7 +232,7 @@ void Crv::boxed(glm::vec3& v) const { box.apply(v); }
 
 vector<Edg> Crv::getWebEdgs(int numPoints, bool boxed, bool transformed,
                             int resolution) const {
-  vector<glm::vec3> vectors = glv3Array(numPoints, boxed, transformed, nullptr);
+  vector<glm::vec3> vectors = glv3Array(numPoints, boxed, transformed);
   vector<Edg> edgs;
   for (int i = 0; i < vectors.size(); ++i) {
     for (int j = 0; j < vectors.size(); ++j) {

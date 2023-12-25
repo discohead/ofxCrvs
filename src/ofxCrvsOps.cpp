@@ -322,6 +322,310 @@ FloatOp Ops::lpf(FloatOp inputOp, int windowSize) const {
   };
 }
 
+FloatOp Ops::mix(vector<FloatOp> ops) const {
+  return [ops](float pos) {
+    float sum = 0.f;
+    for (auto op : ops) {
+      sum += op(pos);
+    }
+    return sum / ops.size();
+  };
+}
+
+FloatOp Ops::mix(vector<FloatOp> ops, vector<float> levels) const {
+  return [ops, levels](float pos) {
+    float sum = 0.f;
+    for (int i = 0; i < ops.size(); ++i) {
+      sum += ops[i](pos) * levels[i];
+    }
+    return sum / ops.size();
+  };
+}
+
+FloatOp Ops::sum(vector<FloatOp> ops) const {
+  return [ops](float pos) {
+    float sum = 0.f;
+    for (auto op : ops) {
+      sum += op(pos);
+    }
+    return sum;
+  };
+}
+
+FloatOp Ops::product(vector<FloatOp> ops) const {
+  return [ops](float pos) {
+    float product = 1.f;
+    for (auto op : ops) {
+      product *= op(pos);
+    }
+    return product;
+  };
+}
+
+FloatOp Ops::min(vector<FloatOp> ops) const {
+  return [ops](float pos) {
+    float min = std::numeric_limits<float>::max();
+    for (auto op : ops) {
+      float val = op(pos);
+      if (val < min) min = val;
+    }
+    return min;
+  };
+}
+
+FloatOp Ops::max(vector<FloatOp> ops) const {
+  return [ops](float pos) {
+    float max = std::numeric_limits<float>::min();
+    for (auto op : ops) {
+      float val = op(pos);
+      if (val > max) max = val;
+    }
+    return max;
+  };
+}
+
+FloatOp Ops::mean(vector<FloatOp> ops) const { return mix(ops); }
+
+FloatOp Ops::median(vector<FloatOp> ops) const {
+  return [ops](float pos) {
+    vector<float> values;
+    for (auto op : ops) {
+      values.push_back(op(pos));
+    }
+    std::sort(values.begin(), values.end());
+    return values[values.size() / 2];
+  };
+}
+
+FloatOp Ops::variance(vector<FloatOp> ops) const {
+  return [ops, this](float pos) {
+    float mn = mean(ops)(pos);
+    float variance = 0.f;
+    for (auto op : ops) {
+      float diff = op(pos) - mn;
+      variance += diff * diff;
+    }
+    variance /= ops.size();
+    return variance;
+  };
+}
+
+FloatOp Ops::stdDev(vector<FloatOp> ops) const {
+  return [ops, this](float pos) { return std::sqrt(variance(ops)(pos)); };
+}
+
+FloatOp Ops::abs(FloatOp op) const {
+  return [op](float pos) { return std::abs(op(pos)); };
+}
+
+FloatOp Ops::diff(FloatOp opA, FloatOp opB) const {
+  return [opA, opB](float pos) { return opA(pos) - opB(pos); };
+}
+
+FloatOp Ops::greater(FloatOp opA, FloatOp opB) const {
+  return [opA, opB](float pos) { return opA(pos) > opB(pos) ? 1.f : 0.f; };
+}
+
+FloatOp Ops::greater(FloatOp opA, float threshold) const {
+  return
+      [opA, threshold](float pos) { return opA(pos) > threshold ? 1.f : 0.f; };
+}
+
+FloatOp Ops::less(FloatOp opA, FloatOp opB) const {
+  return [opA, opB](float pos) { return opA(pos) < opB(pos) ? 1.f : 0.f; };
+}
+
+FloatOp Ops::less(FloatOp opA, float threshold) const {
+  return
+      [opA, threshold](float pos) { return opA(pos) < threshold ? 1.f : 0.f; };
+}
+
+FloatOp Ops::equal(FloatOp opA, FloatOp opB) const {
+  return [opA, opB](float pos) { return opA(pos) == opB(pos) ? 1.f : 0.f; };
+}
+
+FloatOp Ops::equal(FloatOp opA, float threshold) const {
+  return
+      [opA, threshold](float pos) { return opA(pos) == threshold ? 1.f : 0.f; };
+}
+
+FloatOp Ops::notEqual(FloatOp opA, FloatOp opB) const {
+  return [opA, opB](float pos) { return opA(pos) != opB(pos) ? 1.f : 0.f; };
+}
+
+FloatOp Ops::notEqual(FloatOp opA, float threshold) const {
+  return
+      [opA, threshold](float pos) { return opA(pos) != threshold ? 1.f : 0.f; };
+}
+
+FloatOp Ops::and_(FloatOp opA, FloatOp opB, float threshold) const {
+  return [opA, opB, threshold](float pos) {
+    float a = opA(pos);
+    float b = opB(pos);
+    return a > threshold && b > threshold ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::and_(FloatOp opA, FloatOp opB, FloatOp threshold) const {
+  return [opA, opB, threshold](float pos) {
+    float a = opA(pos);
+    float b = opB(pos);
+    float t = threshold(pos);
+    return a > t || b > t ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::or_(FloatOp opA, FloatOp opB, float threshold) const {
+  return [opA, opB, threshold](float pos) {
+    float a = opA(pos);
+    float b = opB(pos);
+    return a > threshold || b > threshold ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::or_(FloatOp opA, FloatOp opB, FloatOp threshold) const {
+  return [opA, opB, threshold](float pos) {
+    float a = opA(pos);
+    float b = opB(pos);
+    float t = threshold(pos);
+    return a > t || b > t ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::not_(FloatOp op) const {
+  return [op](float pos) { return op(pos) == 0.f ? 1.f : 0.f; };
+}
+
+FloatOp Ops::xor_(FloatOp opA, FloatOp opB, float threshold) const {
+  return [opA, opB, threshold](float pos) {
+    float a = opA(pos);
+    float b = opB(pos);
+    return (a > threshold && b <= threshold) ||
+                   (a <= threshold && b > threshold)
+               ? 1.f
+               : 0.f;
+  };
+}
+
+FloatOp Ops::xor_(FloatOp opA, FloatOp opB, FloatOp threshold) const {
+  return [opA, opB, threshold](float pos) {
+    float a = opA(pos);
+    float b = opB(pos);
+    float t = threshold(pos);
+    return (a > t && b <= t) || (a <= t && b > t) ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::nand(FloatOp opA, FloatOp opB, float threshold) const {
+  return [opA, opB, threshold](float pos) {
+    float a = opA(pos);
+    float b = opB(pos);
+    return a > threshold && b > threshold ? 0.f : 1.f;
+  };
+}
+
+FloatOp Ops::nand(FloatOp opA, FloatOp opB, FloatOp threshold) const {
+  return [opA, opB, threshold](float pos) {
+    float a = opA(pos);
+    float b = opB(pos);
+    float t = threshold(pos);
+    return a > t || b > t ? 0.f : 1.f;
+  };
+}
+
+FloatOp Ops::nor(FloatOp opA, FloatOp opB, float threshold) const {
+  return [opA, opB, threshold](float pos) {
+    float a = opA(pos);
+    float b = opB(pos);
+    return a > threshold || b > threshold ? 0.f : 1.f;
+  };
+}
+
+FloatOp Ops::nor(FloatOp opA, FloatOp opB, FloatOp threshold) const {
+  return [opA, opB, threshold](float pos) {
+    float a = opA(pos);
+    float b = opB(pos);
+    float t = threshold(pos);
+    return a > t || b > t ? 0.f : 1.f;
+  };
+}
+
+FloatOp Ops::xnor(FloatOp opA, FloatOp opB, float threshold) const {
+  return [opA, opB, threshold](float pos) {
+    float a = opA(pos);
+    float b = opB(pos);
+    return (a > threshold && b > threshold) ||
+                   (a <= threshold && b <= threshold)
+               ? 1.f
+               : 0.f;
+  };
+}
+
+FloatOp Ops::xnor(FloatOp opA, FloatOp opB, FloatOp threshold) const {
+  return [opA, opB, threshold](float pos) {
+    float a = opA(pos);
+    float b = opB(pos);
+    float t = threshold(pos);
+    return (a > t && b > t) || (a <= t && b <= t) ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::in(FloatOp op, float lo, float hi) const {
+  return [op, lo, hi](float pos) {
+    float val = op(pos);
+    return val >= lo && val <= hi ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::in(FloatOp op, FloatOp lo, FloatOp hi) const {
+  return [op, lo, hi](float pos) {
+    float val = op(pos);
+    return val >= lo(pos) && val <= hi(pos) ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::in(FloatOp op, float lo, FloatOp hi) const {
+  return [op, lo, hi](float pos) {
+    float val = op(pos);
+    return val >= lo && val <= hi(pos) ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::in(FloatOp op, FloatOp lo, float hi) const {
+  return [op, lo, hi](float pos) {
+    float val = op(pos);
+    return val >= lo(pos) && val <= hi ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::out(FloatOp op, float lo, float hi) const {
+  return [op, lo, hi](float pos) {
+    float val = op(pos);
+    return val < lo || val > hi ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::out(FloatOp op, FloatOp lo, FloatOp hi) const {
+  return [op, lo, hi](float pos) {
+    float val = op(pos);
+    return val < lo(pos) || val > hi(pos) ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::out(FloatOp op, float lo, FloatOp hi) const {
+  return [op, lo, hi](float pos) {
+    float val = op(pos);
+    return val < lo || val > hi(pos) ? 1.f : 0.f;
+  };
+}
+
+FloatOp Ops::out(FloatOp op, FloatOp lo, float hi) const {
+  return [op, lo, hi](float pos) {
+    float val = op(pos);
+    return val < lo(pos) || val > hi ? 1.f : 0.f;
+  };
+}
+
 FloatOp Ops::chain(vector<FloatOp> ops) const {
   return [ops](float pos) {
     float val = pos;
