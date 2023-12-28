@@ -837,7 +837,7 @@ float Ops::triDist(const float lo, const float hi, const float mode) const {
 }
 
 float Ops::pNoise(const float x, const float y, const float z,
-                  const float falloff, int octaves) const {
+                  const float falloff, const int octaves) const {
   float amplitude = 1.0f;
   float frequency = 1.0f;
   float total = 0.0f;
@@ -889,8 +889,8 @@ float Ops::pNoise(const float x, const float falloff, const int octaves) const {
   return total / maxAmplitude;
 }
 
-void Ops::plot(const FloatOp &op, const float yScale, ofColor color,
-               bool fill) const {
+void Ops::plot(const FloatOp &op, const float yScale, const ofColor color,
+               const bool fill) const {
   ofPushStyle();
   ofSetColor(color);
   ofSetLineWidth(1);

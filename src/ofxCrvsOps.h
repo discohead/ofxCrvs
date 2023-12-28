@@ -217,29 +217,31 @@ public:
 
   vector<float> normalize(const vector<float> &values) const;
 
-  vector<float> floatArray(const FloatOp &op, int numSamples,
+  vector<float> floatArray(const FloatOp &op, const int numSamples,
                            const FloatOp &mapOp = FloatOp()) const;
   vector<glm::vec2> glv2Array(const FloatOp &curve, const float start,
-                              const float end, int numPoints,
+                              const float end, const int numPoints,
                               const float yScale = 1.0f) const;
   vector<glm::vec3> glv3Array(const FloatOp &curve, const float start,
-                              const float end, int numPoints,
+                              const float end, const int numPoints,
                               const float yScale = 1.0f) const;
   vector<ofVec2f> ofv2Array(const FloatOp &curve, const float start,
-                            const float end, int numPoints,
+                            const float end, const int numPoints,
                             const float yScale = 1.0f) const;
   vector<ofVec3f> ofv3Array(const FloatOp &curve, const float start,
-                            const float end, int numPoints,
+                            const float end, const int numPoints,
                             const float yScale = 1.0f) const;
 
   float triDist(const float lo, const float hi, const float mode) const;
   float pNoise(const float x, const float y, const float z,
-               const float falloff = 1.f, int octaves = 1) const;
+               const float falloff = 1.f, const int octaves = 1) const;
   float pNoise(const float x, const float y, const float falloff = 1.f,
-               int octaves = 1) const;
-  float pNoise(const float x, const float falloff = 1.f, int octaves = 1) const;
+               const int octaves = 1) const;
+  float pNoise(const float x, const float falloff = 1.f,
+               const int octaves = 1) const;
 
   void plot(const FloatOp &op, const float yScale,
-            ofColor color = ofColor::white, bool fill = false) const;
+            const ofColor color = ofColor::white,
+            const bool fill = false) const;
 };
 } // namespace ofxCrvs
