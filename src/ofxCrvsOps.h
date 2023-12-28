@@ -98,6 +98,7 @@ public:
 
   vector<float> table;
   [[nodiscard]] FloatOp wavetable() const;
+  [[nodiscard]] FloatOp lookup() const;
 
   [[nodiscard]] FloatOp easeIn(const FloatOp &e) const;
   [[nodiscard]] FloatOp easeIn() const;

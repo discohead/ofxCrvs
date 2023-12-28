@@ -247,10 +247,28 @@ FloatOp Ops::random(const FloatOp &lo, const FloatOp &hi,
   };
 }
 
-FloatOp Ops::wavetable() const {
+FloatOp Ops::lookup() const {
   return [this](const float pos) {
     const int t = static_cast<int>(ofMap(pos, 0.f, 1.f, 0.f, table.size()));
     const float samp = table[t];
+    return (samp + 1.f) * 0.5f;
+  };
+}
+
+FloatOp Ops::wavetable() const {
+  return [this](const float pos) {
+    // Map pos to the range of the wavetable indices
+    float exactPos = ofMap(pos, 0.f, 1.f, 0.f, table.size());
+
+    // Determine the indices of the surrounding samples
+    int index1 = static_cast<int>(exactPos) % table.size();
+    int index2 = (index1 + 1) % table.size();
+
+    // Calculate the fractional part of the position
+    float fraction = exactPos - static_cast<float>(index1);
+    // Linearly interpolate between the two samples using ofLerp
+    float samp = ofLerp(table[index1], table[index2], fraction);
+
     return (samp + 1.f) * 0.5f;
   };
 }
