@@ -162,85 +162,101 @@ public:
   [[nodiscard]] FloatOp lpf(const FloatOp &inputOp, int windowSize) const;
 
   // Vector Ops - accept arrays of FloatOps
-  FloatOp chain(const vector<FloatOp> &ops) const;
-  FloatOp choose(const vector<FloatOp> &ops) const;
-  FloatOp mix(const vector<FloatOp> &ops) const;
-  FloatOp mix(const vector<FloatOp> &ops, const vector<float> &levels) const;
-  FloatOp mix(const vector<FloatOp> &ops, const vector<FloatOp> &levels) const;
-  FloatOp sum(const vector<FloatOp> &ops) const;
-  FloatOp product(const vector<FloatOp> &ops) const;
-  FloatOp min(const vector<FloatOp> &ops) const;
-  FloatOp max(const vector<FloatOp> &ops) const;
-  FloatOp mean(const vector<FloatOp> &ops) const;
-  FloatOp median(const vector<FloatOp> &ops) const;
-  FloatOp variance(const vector<FloatOp> &ops) const;
-  FloatOp stdDev(const vector<FloatOp> &ops) const;
+  [[nodiscard]] FloatOp chain(const vector<FloatOp> &ops) const;
+  [[nodiscard]] FloatOp choose(const vector<FloatOp> &ops) const;
+  [[nodiscard]] FloatOp mix(const vector<FloatOp> &ops) const;
+  [[nodiscard]] FloatOp mix(const vector<FloatOp> &ops,
+                            const vector<float> &levels) const;
+  [[nodiscard]] FloatOp mix(const vector<FloatOp> &ops,
+                            const vector<FloatOp> &levels) const;
+  [[nodiscard]] FloatOp sum(const vector<FloatOp> &ops) const;
+  [[nodiscard]] FloatOp product(const vector<FloatOp> &ops) const;
+  [[nodiscard]] FloatOp min(const vector<FloatOp> &ops) const;
+  [[nodiscard]] FloatOp max(const vector<FloatOp> &ops) const;
+  [[nodiscard]] FloatOp mean(const vector<FloatOp> &ops) const;
+  [[nodiscard]] FloatOp median(const vector<FloatOp> &ops) const;
+  [[nodiscard]] FloatOp variance(const vector<FloatOp> &ops) const;
+  [[nodiscard]] FloatOp stdDev(const vector<FloatOp> &ops) const;
 
   // Digital Ops - return 0 or 1
-  FloatOp pulse(const FloatOp &w = FloatOp()) const;
-  FloatOp pulse(float w) const;
-  FloatOp square() const;
-  FloatOp greater(const FloatOp &opA, const FloatOp &opB) const;
-  FloatOp greater(const FloatOp &opA, float threshold) const;
-  FloatOp less(const FloatOp &opA, const FloatOp &opB) const;
-  FloatOp less(const FloatOp &opA, float threshold) const;
-  FloatOp equal(const FloatOp &opA, const FloatOp &opB) const;
-  FloatOp equal(const FloatOp &opA, float threshold) const;
-  FloatOp notEqual(const FloatOp &opA, const FloatOp &opB) const;
-  FloatOp notEqual(const FloatOp &opA, float threshold) const;
-  FloatOp and_(const FloatOp &opA, const FloatOp &opB,
-               float threshold = 0.5f) const;
-  FloatOp and_(const FloatOp &opA, const FloatOp &opB,
-               const FloatOp &threshold) const;
-  FloatOp or_(const FloatOp &opA, const FloatOp &opB,
-              float threshold = 0.5f) const;
-  FloatOp or_(const FloatOp &opA, const FloatOp &opB,
-              const FloatOp &threshold) const;
-  FloatOp not_(const FloatOp &op) const;
-  FloatOp xor_(const FloatOp &opA, const FloatOp &opB,
-               float threshold = 0.5f) const;
-  FloatOp xor_(const FloatOp &opA, const FloatOp &opB,
-               const FloatOp &threshold) const;
-  FloatOp nand(const FloatOp &opA, const FloatOp &opB,
-               float threshold = 0.5f) const;
-  FloatOp nand(const FloatOp &opA, const FloatOp &opB,
-               const FloatOp &threshold) const;
-  FloatOp nor(const FloatOp &opA, const FloatOp &opB,
-              float threshold = 0.5f) const;
-  FloatOp nor(const FloatOp &opA, const FloatOp &opB,
-              const FloatOp &threshold) const;
-  FloatOp xnor(const FloatOp &opA, const FloatOp &opB,
-               float threshold = 0.5f) const;
-  FloatOp xnor(const FloatOp &opA, const FloatOp &opB,
-               const FloatOp &threshold) const;
-  FloatOp in(const FloatOp &op, float lo, float hi) const;
-  FloatOp in(const FloatOp &op, const FloatOp &lo, const FloatOp &hi) const;
-  FloatOp in(const FloatOp &op, float lo, const FloatOp &hi) const;
-  FloatOp in(const FloatOp &op, const FloatOp &lo, float hi) const;
-  FloatOp out(const FloatOp &op, float lo, float hi) const;
-  FloatOp out(const FloatOp &op, const FloatOp &lo, const FloatOp &hi) const;
-  FloatOp out(const FloatOp &op, float lo, const FloatOp &hi) const;
-  FloatOp out(const FloatOp &op, const FloatOp &lo, float hi) const;
+  [[nodiscard]] FloatOp pulse(const FloatOp &w = FloatOp()) const;
+  [[nodiscard]] FloatOp pulse(float w) const;
+  [[nodiscard]] FloatOp square() const;
+  [[nodiscard]] FloatOp greater(const FloatOp &opA, const FloatOp &opB) const;
+  [[nodiscard]] FloatOp greater(const FloatOp &opA, float threshold) const;
+  [[nodiscard]] FloatOp less(const FloatOp &opA, const FloatOp &opB) const;
+  [[nodiscard]] FloatOp less(const FloatOp &opA, float threshold) const;
+  [[nodiscard]] FloatOp equal(const FloatOp &opA, const FloatOp &opB) const;
+  [[nodiscard]] FloatOp equal(const FloatOp &opA, float threshold) const;
+  [[nodiscard]] FloatOp notEqual(const FloatOp &opA, const FloatOp &opB) const;
+  [[nodiscard]] FloatOp notEqual(const FloatOp &opA, float threshold) const;
+  [[nodiscard]] FloatOp and_(const FloatOp &opA, const FloatOp &opB,
+                             float threshold = 0.5f) const;
+  [[nodiscard]] FloatOp and_(const FloatOp &opA, const FloatOp &opB,
+                             const FloatOp &threshold) const;
+  [[nodiscard]] FloatOp or_(const FloatOp &opA, const FloatOp &opB,
+                            float threshold = 0.5f) const;
+  [[nodiscard]] FloatOp or_(const FloatOp &opA, const FloatOp &opB,
+                            const FloatOp &threshold) const;
+  [[nodiscard]] FloatOp not_(const FloatOp &op) const;
+  [[nodiscard]] FloatOp xor_(const FloatOp &opA, const FloatOp &opB,
+                             float threshold = 0.5f) const;
+  [[nodiscard]] FloatOp xor_(const FloatOp &opA, const FloatOp &opB,
+                             const FloatOp &threshold) const;
+  [[nodiscard]] FloatOp nand(const FloatOp &opA, const FloatOp &opB,
+                             float threshold = 0.5f) const;
+  [[nodiscard]] FloatOp nand(const FloatOp &opA, const FloatOp &opB,
+                             const FloatOp &threshold) const;
+  [[nodiscard]] FloatOp nor(const FloatOp &opA, const FloatOp &opB,
+                            float threshold = 0.5f) const;
+  [[nodiscard]] FloatOp nor(const FloatOp &opA, const FloatOp &opB,
+                            const FloatOp &threshold) const;
+  [[nodiscard]] FloatOp xnor(const FloatOp &opA, const FloatOp &opB,
+                             float threshold = 0.5f) const;
+  [[nodiscard]] FloatOp xnor(const FloatOp &opA, const FloatOp &opB,
+                             const FloatOp &threshold) const;
+  [[nodiscard]] [[nodiscard]] FloatOp in(const FloatOp &op, float lo,
+                                         float hi) const;
+  [[nodiscard]] FloatOp in(const FloatOp &op, const FloatOp &lo,
+                           const FloatOp &hi) const;
+  [[nodiscard]] FloatOp in(const FloatOp &op, float lo,
+                           const FloatOp &hi) const;
+  [[nodiscard]] FloatOp in(const FloatOp &op, const FloatOp &lo,
+                           float hi) const;
+  [[nodiscard]] FloatOp out(const FloatOp &op, float lo, float hi) const;
+  [[nodiscard]] FloatOp out(const FloatOp &op, const FloatOp &lo,
+                            const FloatOp &hi) const;
+  [[nodiscard]] FloatOp out(const FloatOp &op, float lo,
+                            const FloatOp &hi) const;
+  [[nodiscard]] FloatOp out(const FloatOp &op, const FloatOp &lo,
+                            float hi) const;
   // End Digital Ops
 
-  vector<float> normalize(const vector<float> &values) const;
+  [[nodiscard]] vector<float> normalize(const vector<float> &values) const;
 
-  vector<float> floatArray(const FloatOp &op, int numSamples,
-                           const FloatOp &mapOp = FloatOp()) const;
-  vector<glm::vec2> glv2Array(const FloatOp &curve, float start, float end,
-                              int numPoints, float yScale = 1.0f) const;
-  vector<glm::vec3> glv3Array(const FloatOp &curve, float start, float end,
-                              int numPoints, float yScale = 1.0f) const;
-  vector<ofVec2f> ofv2Array(const FloatOp &curve, float start, float end,
-                            int numPoints, float yScale = 1.0f) const;
-  vector<ofVec3f> ofv3Array(const FloatOp &curve, float start, float end,
-                            int numPoints, float yScale = 1.0f) const;
+  [[nodiscard]] vector<float>
+  floatArray(const FloatOp &op, int numSamples,
+             const FloatOp &mapOp = FloatOp()) const;
+  [[nodiscard]] vector<glm::vec2> glv2Array(const FloatOp &curve, float start,
+                                            float end, int numPoints,
+                                            float yScale = 1.0f) const;
+  [[nodiscard]] vector<glm::vec3> glv3Array(const FloatOp &curve, float start,
+                                            float end, int numPoints,
+                                            float yScale = 1.0f) const;
+  [[nodiscard]] vector<ofVec2f> ofv2Array(const FloatOp &curve, float start,
+                                          float end, int numPoints,
+                                          float yScale = 1.0f) const;
+  [[nodiscard]] vector<ofVec3f> ofv3Array(const FloatOp &curve, float start,
+                                          float end, int numPoints,
+                                          float yScale = 1.0f) const;
 
-  float triDist(float lo, float hi, float mode) const;
-  float pNoise(float x, float y, float z, float falloff = 1.f,
-               int octaves = 1) const;
-  float pNoise(float x, float y, float falloff = 1.f, int octaves = 1) const;
-  float pNoise(float x, float falloff = 1.f, int octaves = 1) const;
+  [[nodiscard]] float triDist(float lo, float hi, float mode) const;
+  [[nodiscard]] float pNoise(float x, float y, float z, float falloff = 1.f,
+                             int octaves = 1) const;
+  [[nodiscard]] float pNoise(float x, float y, float falloff = 1.f,
+                             int octaves = 1) const;
+  [[nodiscard]] float pNoise(float x, float falloff = 1.f,
+                             int octaves = 1) const;
 
   void plot(const FloatOp &op, float yScale, ofColor color = ofColor::white,
             bool fill = false) const;
