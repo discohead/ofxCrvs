@@ -397,6 +397,15 @@ FloatOp Ops::lpf(const FloatOp &inputOp, const int windowSize) const {
   };
 }
 
+FloatOp Ops::morph(const FloatOp &opA, const FloatOp &opB,
+                   const FloatOp &morphParam) const {
+  return [opA, opB, morphParam](const float pos) -> float {
+    float blend = morphParam(pos);
+    blend = std::clamp(blend, 0.0f, 1.0f); // Ensure blend stays within [0, 1]
+    return (1.0f - blend) * opA(pos) + blend * opB(pos);
+  };
+}
+
 FloatOp Ops::mix(const vector<FloatOp> &ops) const {
   return [ops](const float pos) {
     float sum = 0.f;
@@ -501,6 +510,40 @@ FloatOp Ops::variance(const vector<FloatOp> &ops) const {
 
 FloatOp Ops::stdDev(const vector<FloatOp> &ops) const {
   return [ops, this](const float pos) { return std::sqrt(variance(ops)(pos)); };
+}
+
+FloatOp Ops::smooth() const {
+  return [](const float pos) -> float {
+    // Clamp x to the range [0, 1]
+    float clampedX = std::clamp(pos, 0.0f, 1.0f);
+    return clampedX * clampedX * (3 - 2 * clampedX);
+  };
+}
+
+FloatOp Ops::smoother() const {
+  return [](const float pos) -> float {
+    // Clamp x to the range [0, 1]
+    float clampedX = std::clamp(pos, 0.0f, 1.0f);
+    return clampedX * clampedX * clampedX *
+           (clampedX * (clampedX * 6 - 15) + 10);
+  };
+}
+
+FloatOp Ops::ema(float smoothingFactor) const {
+  return
+      [smoothingFactor, lastOutput = 0.0f](const float pos) mutable -> float {
+        lastOutput = smoothingFactor * pos + (1 - smoothingFactor) * lastOutput;
+        return lastOutput;
+      };
+}
+
+FloatOp Ops::ema(const FloatOp &smoothingFactor) const {
+  return
+      [smoothingFactor, lastOutput = 0.0f](const float pos) mutable -> float {
+        const float smoothing = smoothingFactor(pos);
+        lastOutput = smoothing * pos + (1 - smoothing) * lastOutput;
+        return lastOutput;
+      };
 }
 
 FloatOp Ops::abs(const FloatOp &op) const {

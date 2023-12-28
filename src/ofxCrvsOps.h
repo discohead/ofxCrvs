@@ -163,6 +163,8 @@ public:
   [[nodiscard]] FloatOp wrap(const FloatOp &op, const FloatOp &minOp,
                              const FloatOp &maxOp) const;
   [[nodiscard]] FloatOp lpf(const FloatOp &inputOp, int windowSize) const;
+  [[nodiscard]] FloatOp morph(const FloatOp &opA, const FloatOp &opB,
+                              const FloatOp &morphParam) const;
 
   // Vector Ops - accept arrays of FloatOps
   [[nodiscard]] FloatOp chain(const vector<FloatOp> &ops) const;
@@ -180,6 +182,11 @@ public:
   [[nodiscard]] FloatOp median(const vector<FloatOp> &ops) const;
   [[nodiscard]] FloatOp variance(const vector<FloatOp> &ops) const;
   [[nodiscard]] FloatOp stdDev(const vector<FloatOp> &ops) const;
+
+  [[nodiscard]] FloatOp smooth() const;
+  [[nodiscard]] FloatOp smoother() const;
+  [[nodiscard]] FloatOp ema(float smoothingFactor) const;
+  [[nodiscard]] FloatOp ema(const FloatOp &smoothingFactor) const;
 
   // Digital Ops - return 0 or 1
   [[nodiscard]] FloatOp pulse(const FloatOp &w = FloatOp()) const;
