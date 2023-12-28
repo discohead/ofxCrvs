@@ -168,6 +168,8 @@ public:
                               const FloatOp &morphParam) const;
 
   // Vector Ops - accept arrays of FloatOps
+  [[nodiscard]] FloatOp morph(const vector<FloatOp> &ops,
+                              const FloatOp &morphParam) const;
   [[nodiscard]] FloatOp chain(const vector<FloatOp> &ops) const;
   [[nodiscard]] FloatOp choose(const vector<FloatOp> &ops) const;
   [[nodiscard]] FloatOp mix(const vector<FloatOp> &ops) const;

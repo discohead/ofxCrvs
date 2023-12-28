@@ -421,7 +421,27 @@ FloatOp Ops::morph(const FloatOp &opA, const FloatOp &opB,
     float blend = morphParam(pos);
     blend = std::clamp(blend, 0.0f, 1.0f); // Ensure blend stays within [0, 1]
     return (1.0f - blend) * opA(pos) + blend * opB(pos);
-  };
+  }
+}
+
+FloatOp Ops::morph(const vector<FloatOp> &ops,
+                   const FloatOp &morphParam) const {
+  return [ops, morphParam](const float pos) -> float {
+    float blend = morphParam(pos);
+    blend = std::clamp(blend, 0.0f, 1.0f); // Ensure blend stays within [0, 1]
+
+    // Map pos to the range of the op indices
+    float exactPos = ofMap(pos, 0.f, 1.f, 0.f, ops.size());
+
+    // Determine the indices of the surrounding ops
+    int index1 = static_cast<int>(exactPos) % ops.size();
+    int index2 = (index1 + 1) % ops.size();
+
+    // Calculate the fractional part of the position
+    float fraction = exactPos - static_cast<float>(index1);
+    // Linearly interpolate between the two ops using ofLerp
+    float samp = ofLerp(ops[index1](pos), ops[index2](pos), fraction);
+  }
 }
 
 FloatOp Ops::mix(const vector<FloatOp> &ops) const {
