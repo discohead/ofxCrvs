@@ -331,6 +331,29 @@ FloatOp Ops::ring(const FloatOp &opA, const FloatOp &opB) const {
   };
 }
 
+FloatOp Ops::wrap(const FloatOp &op, float min, float max) const {
+  return [op, min, max](const float pos) {
+    const float val = op(pos);
+    if (val < min)
+      return max - (min - val);
+    else if (val > max)
+      return min + (val - max);
+  };
+}
+
+FloatOp Ops::wrap(const FloatOp &op, const FloatOp &minOp,
+                  const FloatOp &maxOp) const {
+  return [op, minOp, maxOp](const float pos) {
+    const float val = op(pos);
+    const float minVal = minOp(pos);
+    const float maxVal = maxOp(pos);
+    if (val < minVal)
+      return maxVal - (minVal - val);
+    else if (val > maxVal)
+      return minVal + (val - maxVal);
+  };
+}
+
 FloatOp Ops::fold(const FloatOp &op, const FloatOp &threshold) const {
   return [op, threshold](const float pos) {
     float val = op(pos);

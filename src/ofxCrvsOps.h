@@ -159,6 +159,9 @@ public:
   [[nodiscard]] FloatOp fold(const FloatOp &op, const FloatOp &threshold) const;
   [[nodiscard]] FloatOp fold(const FloatOp &op, float threshold) const;
   [[nodiscard]] FloatOp fold(const FloatOp &op) const;
+  [[nodiscard]] FloatOp wrap(const FloatOp &op, float min, float max) const;
+  [[nodiscard]] FloatOp wrap(const FloatOp &op, const FloatOp &minOp,
+                             const FloatOp &maxOp) const;
   [[nodiscard]] FloatOp lpf(const FloatOp &inputOp, int windowSize) const;
 
   // Vector Ops - accept arrays of FloatOps
@@ -215,8 +218,7 @@ public:
                              float threshold = 0.5f) const;
   [[nodiscard]] FloatOp xnor(const FloatOp &opA, const FloatOp &opB,
                              const FloatOp &threshold) const;
-  [[nodiscard]] [[nodiscard]] FloatOp in(const FloatOp &op, float lo,
-                                         float hi) const;
+  [[nodiscard]] FloatOp in(const FloatOp &op, float lo, float hi) const;
   [[nodiscard]] FloatOp in(const FloatOp &op, const FloatOp &lo,
                            const FloatOp &hi) const;
   [[nodiscard]] FloatOp in(const FloatOp &op, float lo,
@@ -237,6 +239,7 @@ public:
   [[nodiscard]] vector<float>
   floatArray(const FloatOp &op, int numSamples,
              const FloatOp &mapOp = FloatOp()) const;
+
   [[nodiscard]] vector<glm::vec2> glv2Array(const FloatOp &curve, float start,
                                             float end, int numPoints,
                                             float yScale = 1.0f) const;
