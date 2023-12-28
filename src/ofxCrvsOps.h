@@ -59,19 +59,23 @@ public:
     return [](float) { return glm::two_pi<float>(); };
   };
   [[nodiscard]] FloatOp appWidth() const {
-    return [](float) { return ofGetWidth(); };
+    return [](float) { return static_cast<float>(ofGetWidth()); };
   };
   [[nodiscard]] FloatOp appHeight() const {
-    return [](float) { return ofGetHeight(); };
+    return [](float) { return static_cast<float>(ofGetHeight()); };
   };
-  [[nodiscard]] FloatOp frameNum() const {
-    return [](float) { return ofGetFrameNum(); };
+
+  [[nodiscard]] FloatOp framePhasor(int modValue) const {
+    return [modValue](float) {
+      return (ofGetFrameNum() % modValue) / static_cast<float>(modValue);
+    };
   };
+
   [[nodiscard]] FloatOp mouseX() const {
-    return [](float) { return ofGetMouseX(); };
+    return [](float) { return static_cast<float>(ofGetMouseX()); };
   };
   [[nodiscard]] FloatOp mouseY() const {
-    return [](float) { return ofGetMouseY(); };
+    return [](float) { return static_cast<float>(ofGetMouseY()); };
   };
 
   static float pos2Rad(float pos);
