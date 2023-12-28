@@ -377,7 +377,7 @@ FloatOp Ops::lpf(const FloatOp &inputOp, const int windowSize) const {
 FloatOp Ops::mix(const vector<FloatOp> &ops) const {
   return [ops](const float pos) {
     float sum = 0.f;
-    for (auto op : ops) {
+    for (const auto &op : ops) {
       sum += op(pos);
     }
     return sum / ops.size();
@@ -409,7 +409,7 @@ FloatOp Ops::mix(const vector<FloatOp> &ops,
 FloatOp Ops::sum(const vector<FloatOp> &ops) const {
   return [ops](const float pos) {
     float sum = 0.f;
-    for (auto op : ops) {
+    for (const auto &op : ops) {
       sum += op(pos);
     }
     return sum;
@@ -419,7 +419,7 @@ FloatOp Ops::sum(const vector<FloatOp> &ops) const {
 FloatOp Ops::product(const vector<FloatOp> &ops) const {
   return [ops](const float pos) {
     float product = 1.f;
-    for (auto op : ops) {
+    for (const auto &op : ops) {
       product *= op(pos);
     }
     return product;
@@ -429,7 +429,7 @@ FloatOp Ops::product(const vector<FloatOp> &ops) const {
 FloatOp Ops::min(const vector<FloatOp> &ops) const {
   return [ops](const float pos) {
     float min = std::numeric_limits<float>::max();
-    for (auto op : ops) {
+    for (const auto &op : ops) {
       if (const float val = op(pos); val < min)
         min = val;
     }
@@ -440,7 +440,7 @@ FloatOp Ops::min(const vector<FloatOp> &ops) const {
 FloatOp Ops::max(const vector<FloatOp> &ops) const {
   return [ops](const float pos) {
     float max = std::numeric_limits<float>::min();
-    for (auto op : ops) {
+    for (const auto &op : ops) {
       if (const float val = op(pos); val > max)
         max = val;
     }
@@ -453,7 +453,9 @@ FloatOp Ops::mean(const vector<FloatOp> &ops) const { return mix(ops); }
 FloatOp Ops::median(const vector<FloatOp> &ops) const {
   return [ops](const float pos) {
     vector<float> values;
-    for (auto op : ops) {
+    values.reserve(ops.size());
+
+    for (const auto &op : ops) {
       values.push_back(op(pos));
     }
     std::sort(values.begin(), values.end());
@@ -465,7 +467,7 @@ FloatOp Ops::variance(const vector<FloatOp> &ops) const {
   return [ops, this](const float pos) {
     const float mn = mean(ops)(pos);
     float variance = 0.f;
-    for (auto op : ops) {
+    for (const auto &op : ops) {
       const float diff = op(pos) - mn;
       variance += diff * diff;
     }
@@ -714,7 +716,7 @@ FloatOp Ops::out(const FloatOp &op, const FloatOp &lo, const float hi) const {
 FloatOp Ops::chain(const vector<FloatOp> &ops) const {
   return [ops](const float pos) {
     float val = pos;
-    for (auto op : ops) {
+    for (const auto &op : ops) {
       val = op(val);
     }
     return val;
@@ -757,16 +759,16 @@ FloatOp Ops::timeseries(const vector<float> &yValues) const {
 vector<float> Ops::floatArray(const FloatOp &op, const int numSamples,
                               const FloatOp &mapOp) const {
   const float step = 1.f / numSamples;
-  vector<float> table(numSamples);
+  vector<float> localTable(numSamples);
   for (int i = 0; i < numSamples; ++i) {
     const float pos = i * step;
-    table[i] = op(pos / numSamples);
+    localTable[i] = op(pos / numSamples);
   }
   if (!mapOp)
-    return table;
+    return localTable;
   vector<float> mappedTable(numSamples);
   for (int i = 0; i < numSamples; ++i) {
-    mappedTable[i] = mapOp(table[i]);
+    mappedTable[i] = mapOp(localTable[i]);
   }
   return mappedTable;
 }
