@@ -20,62 +20,62 @@ public:
   explicit Ops(const vector<float> &table) : table(table){};
 
   [[nodiscard]] FloatOp zero() const {
-    return [](float) { return 0.0f; };
+    return [](const float) { return 0.0f; };
   };
   [[nodiscard]] FloatOp fourth() const {
-    return [](float) { return 0.25f; };
+    return [](const float) { return 0.25f; };
   };
   [[nodiscard]] FloatOp third() const {
-    return [](float) { return 1.f / 3.f; };
+    return [](const float) { return 1.f / 3.f; };
   };
   [[nodiscard]] FloatOp half() const {
-    return [](float) { return 0.5f; };
+    return [](const float) { return 0.5f; };
   };
   [[nodiscard]] FloatOp one() const {
-    return [](float) { return 1.0f; };
+    return [](const float) { return 1.0f; };
   };
   [[nodiscard]] FloatOp two() const {
-    return [](float) { return 2.0f; };
+    return [](const float) { return 2.0f; };
   };
   [[nodiscard]] FloatOp three() const {
-    return [](float) { return 3.0f; };
+    return [](const float) { return 3.0f; };
   };
   [[nodiscard]] FloatOp four() const {
-    return [](float) { return 4.0f; };
+    return [](const float) { return 4.0f; };
   };
   [[nodiscard]] FloatOp quarterPi() const {
-    return [](float) { return glm::quarter_pi<float>(); };
+    return [](const float) { return glm::quarter_pi<float>(); };
   };
   [[nodiscard]] FloatOp thirdPi() const {
-    return [](float) { return glm::pi<float>() / 3.f; };
+    return [](const float) { return glm::pi<float>() / 3.f; };
   };
   [[nodiscard]] FloatOp halfPi() const {
-    return [](float) { return glm::half_pi<float>(); };
+    return [](const float) { return glm::half_pi<float>(); };
   };
   [[nodiscard]] FloatOp pi() const {
-    return [](float) { return glm::pi<float>(); };
+    return [](const float) { return glm::pi<float>(); };
   };
   [[nodiscard]] FloatOp twoPi() const {
-    return [](float) { return glm::two_pi<float>(); };
+    return [](const float) { return glm::two_pi<float>(); };
   };
   [[nodiscard]] FloatOp appWidth() const {
-    return [](float) { return static_cast<float>(ofGetWidth()); };
+    return [](const float) { return static_cast<float>(ofGetWidth()); };
   };
   [[nodiscard]] FloatOp appHeight() const {
-    return [](float) { return static_cast<float>(ofGetHeight()); };
+    return [](const float) { return static_cast<float>(ofGetHeight()); };
   };
 
   [[nodiscard]] FloatOp framePhasor(int modValue) const {
-    return [modValue](float) {
+    return [modValue](const float) {
       return (ofGetFrameNum() % modValue) / static_cast<float>(modValue);
     };
   };
 
   [[nodiscard]] FloatOp mouseX() const {
-    return [](float) { return static_cast<float>(ofGetMouseX()); };
+    return [](const float) { return static_cast<float>(ofGetMouseX()); };
   };
   [[nodiscard]] FloatOp mouseY() const {
-    return [](float) { return static_cast<float>(ofGetMouseY()); };
+    return [](const float) { return static_cast<float>(ofGetMouseY()); };
   };
 
   static float pos2Rad(float pos);
