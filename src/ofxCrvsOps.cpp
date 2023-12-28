@@ -356,6 +356,7 @@ FloatOp Ops::wrap(const FloatOp &op, float min, float max) const {
       return max - (min - val);
     else if (val > max)
       return min + (val - max);
+    return val;
   };
 }
 
@@ -369,6 +370,7 @@ FloatOp Ops::wrap(const FloatOp &op, const FloatOp &minOp,
       return maxVal - (minVal - val);
     else if (val > maxVal)
       return minVal + (val - maxVal);
+    return val;
   };
 }
 
@@ -421,7 +423,7 @@ FloatOp Ops::morph(const FloatOp &opA, const FloatOp &opB,
     float blend = morphParam(pos);
     blend = std::clamp(blend, 0.0f, 1.0f); // Ensure blend stays within [0, 1]
     return (1.0f - blend) * opA(pos) + blend * opB(pos);
-  }
+  };
 }
 
 FloatOp Ops::morph(const vector<FloatOp> &ops,
@@ -440,8 +442,8 @@ FloatOp Ops::morph(const vector<FloatOp> &ops,
     // Calculate the fractional part of the position
     float fraction = exactPos - static_cast<float>(index1);
     // Linearly interpolate between the two ops using ofLerp
-    float samp = ofLerp(ops[index1](pos), ops[index2](pos), fraction);
-  }
+    return ofLerp(ops[index1](pos), ops[index2](pos), fraction);
+  };
 }
 
 FloatOp Ops::mix(const vector<FloatOp> &ops) const {
