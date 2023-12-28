@@ -157,7 +157,6 @@ class Crv {
   glm::vec3 wVector(float pos, bool transformed) const;
 
   void boxed(glm::vec3& v) const;
-  void transform(glm::vec3& v) const;
   void bounded(glm::vec3& v) const;
   void wrapped(glm::vec3& v) const;
   void folded(glm::vec3& v) const;
