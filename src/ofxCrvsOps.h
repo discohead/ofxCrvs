@@ -64,13 +64,6 @@ public:
   [[nodiscard]] FloatOp appHeight() const {
     return [](const float) { return static_cast<float>(ofGetHeight()); };
   };
-
-  [[nodiscard]] FloatOp framePhasor(int modValue) const {
-    return [modValue](const float) {
-      return (ofGetFrameNum() % modValue) / static_cast<float>(modValue);
-    };
-  };
-
   [[nodiscard]] FloatOp mouseX() const {
     return [](const float) { return static_cast<float>(ofGetMouseX()); };
   };
@@ -83,6 +76,7 @@ public:
   [[nodiscard]] FloatOp bipolarize(const FloatOp &unipolarOp) const;
   [[nodiscard]] FloatOp rectify(const FloatOp &bipolarOp) const;
   [[nodiscard]] FloatOp c(float value) const;
+  [[nodiscard]] FloatOp framePhasor(const int framesPerCycle) const;
   [[nodiscard]] FloatOp phasor() const;
   [[nodiscard]] FloatOp saw() const;
   [[nodiscard]] FloatOp tri(const FloatOp &s) const;

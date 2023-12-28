@@ -19,6 +19,13 @@ FloatOp Ops::c(const float value) const {
   return [value](const float /*pos*/) { return value; };
 }
 
+FloatOp Ops::framePhasor(const int framesPerCycle) const {
+  return [framesPerCycle](const float) {
+    return (ofGetFrameNum() % static_cast<uint64_t>(framesPerCycle)) /
+           static_cast<float>(framesPerCycle);
+  };
+};
+
 FloatOp Ops::phasor() const {
   return [](const float pos) { return pos; };
 }
