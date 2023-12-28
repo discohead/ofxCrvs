@@ -16,7 +16,7 @@ FloatOp Ops::rectify(const FloatOp &bipolarOp) const {
 }
 
 FloatOp Ops::c(const float value) const {
-  return [value](float /*pos*/) { return value; };
+  return [value](const float /*pos*/) { return value; };
 }
 
 FloatOp Ops::phasor() const {
@@ -728,7 +728,7 @@ FloatOp Ops::choose(const vector<FloatOp> &ops) const {
   };
 }
 
-vector<float> Ops::normalize(vector<float> &values) const {
+vector<float> Ops::normalize(const vector<float> &values) const {
   // Find min and max using structured bindings
   const auto [minIt, maxIt] = std::minmax_element(values.begin(), values.end());
   const float min = *minIt;
@@ -744,7 +744,7 @@ vector<float> Ops::normalize(vector<float> &values) const {
   return normValues;
 }
 
-FloatOp Ops::timeseries(vector<float> &yValues) const {
+FloatOp Ops::timeseries(const vector<float> &yValues) const {
   vector<float> normValues = normalize(yValues);
   return [normValues](const float pos) {
     const int index = static_cast<int>(pos * (normValues.size() - 1));
@@ -827,7 +827,7 @@ vector<ofVec3f> Ops::ofv3Array(const FloatOp &curve, const float start,
   return points;
 }
 
-float Ops::triDist(float lo, const float hi, const float mode) const {
+float Ops::triDist(const float lo, const float hi, const float mode) const {
   const float F = (mode - lo) / (hi - lo);
   if (const float rand = ofRandom(1.f); rand < F) {
     return lo + std::sqrt(rand * (hi - lo) * (mode - lo));
@@ -836,8 +836,8 @@ float Ops::triDist(float lo, const float hi, const float mode) const {
   }
 }
 
-float Ops::pNoise(float x, const float y, const float z, const float falloff,
-                  int octaves) const {
+float Ops::pNoise(const float x, const float y, const float z,
+                  const float falloff, int octaves) const {
   float amplitude = 1.0f;
   float frequency = 1.0f;
   float total = 0.0f;
@@ -854,7 +854,7 @@ float Ops::pNoise(float x, const float y, const float z, const float falloff,
   return total / maxAmplitude;
 }
 
-float Ops::pNoise(float x, const float y, const float falloff,
+float Ops::pNoise(const float x, const float y, const float falloff,
                   int octaves) const {
   float amplitude = 1.0f;
   float frequency = 1.0f;
@@ -872,7 +872,7 @@ float Ops::pNoise(float x, const float y, const float falloff,
   return total / maxAmplitude;
 }
 
-float Ops::pNoise(float x, const float falloff, const int octaves) const {
+float Ops::pNoise(const float x, const float falloff, const int octaves) const {
   float amplitude = 1.0f;
   float frequency = 1.0f;
   float total = 0.0f;

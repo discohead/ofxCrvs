@@ -96,6 +96,9 @@ public:
   FloatOp tan(const float fb) const;
   FloatOp tan() const;
 
+  vector<float> table;
+  FloatOp wavetable() const;
+
   FloatOp easeIn(const FloatOp &e) const;
   FloatOp easeIn() const;
   FloatOp easeIn(const float e) const;
@@ -115,6 +118,7 @@ public:
               const float sustainLevel, float releaseLength) const;
 
   FloatOp breakpoints(const vector<vector<float>> &points) const;
+  FloatOp timeseries(const vector<float> &yValues) const;
 
   FloatOp gaussian(const FloatOp &lo, const FloatOp &hi) const;
   FloatOp gaussian(const FloatOp &hi) const { return gaussian(FloatOp(), hi); };
@@ -211,8 +215,7 @@ public:
   FloatOp out(const FloatOp &op, const FloatOp &lo, const float hi) const;
   // End Digital Ops
 
-  vector<float> normalize(vector<float> &values) const;
-  FloatOp timeseries(vector<float> &yValues) const;
+  vector<float> normalize(const vector<float> &values) const;
 
   vector<float> floatArray(const FloatOp &op, int numSamples,
                            const FloatOp &mapOp = FloatOp()) const;
@@ -235,9 +238,6 @@ public:
   float pNoise(const float x, const float y, const float falloff = 1.f,
                int octaves = 1) const;
   float pNoise(const float x, const float falloff = 1.f, int octaves = 1) const;
-
-  vector<float> table;
-  FloatOp wavetable() const;
 
   void plot(const FloatOp &op, const float yScale,
             ofColor color = ofColor::white, bool fill = false) const;
