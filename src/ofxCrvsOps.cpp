@@ -19,12 +19,17 @@ FloatOp Ops::c(const float value) const {
   return [value](const float /*pos*/) { return value; };
 }
 
-FloatOp Ops::framePhasor(const int framesPerCycle) const {
-  return [framesPerCycle](const float) {
-    return (ofGetFrameNum() % static_cast<uint64_t>(framesPerCycle)) /
-           static_cast<float>(framesPerCycle);
+FloatOp Ops::framePhasor(const float cyclesPerSecond) const {
+  return [cyclesPerSecond](const float) {
+    double cycleDuration = 1.0 / static_cast<double>(cyclesPerSecond);
+
+    // Use microseconds for the time base
+    double currentTime =
+        ofGetElapsedTimeMicros() / 1000000.0; // Convert to seconds
+
+    return fmod(currentTime, cycleDuration) / cycleDuration;
   };
-};
+}
 
 FloatOp Ops::phasor() const {
   return [](const float pos) { return pos; };
@@ -254,29 +259,123 @@ FloatOp Ops::random(const FloatOp &lo, const FloatOp &hi,
   };
 }
 
-FloatOp Ops::lookup() const {
-  return [this](const float pos) {
+FloatOp Ops::lookup(const std::vector<float> &table) const {
+  return [table](const float pos) {
     const int t = static_cast<int>(ofMap(pos, 0.f, 1.f, 0.f, table.size()));
-    const float samp = table[t];
-    return (samp + 1.f) * 0.5f;
+    return table[t];
   };
 }
 
-FloatOp Ops::wavetable() const {
-  return [this](const float pos) {
+FloatOp Ops::wt(const std::vector<float> &wTable) const {
+  return [wTable](const float pos) {
     // Map pos to the range of the wavetable indices
-    float exactPos = ofMap(pos, 0.f, 1.f, 0.f, table.size());
+    float exactPos = ofMap(pos, 0.f, 1.f, 0.f, wTable.size());
 
     // Determine the indices of the surrounding samples
-    int index1 = static_cast<int>(exactPos) % table.size();
-    int index2 = (index1 + 1) % table.size();
+    int index1 = static_cast<int>(exactPos) % wTable.size();
+    int index2 = (index1 + 1) % wTable.size();
 
     // Calculate the fractional part of the position
     float fraction = exactPos - static_cast<float>(index1);
     // Linearly interpolate between the two samples using ofLerp
-    float samp = ofLerp(table[index1], table[index2], fraction);
+    return ofLerp(wTable[index1], wTable[index2], fraction);
+  };
+}
 
-    return (samp + 1.f) * 0.5f;
+FloatOp Ops::wt(const std::vector<float> &wTable, const FloatOp &xOp) const {
+  return [wTable, xOp](float pos) {
+    // Map xOp to the range of the wavetable
+    float xPos = ofMap(xOp(pos), 0.f, 1.f, 0.f, wTable.size() - 1);
+
+    // Compute the lower index for the x axis
+    std::size_t xIndex = static_cast<std::size_t>(xPos);
+
+    // Compute the fractional part for the x axis
+    float xFrac = xPos - xIndex;
+
+    // Ensure index is within bounds
+    std::size_t xIndexNext = std::min(xIndex + 1, wTable.size() - 1);
+
+    // Linear interpolation
+    return ofLerp(wTable[xIndex], wTable[xIndexNext], xFrac);
+  };
+}
+
+FloatOp Ops::wt2d(const std::vector<std::vector<float>> &wTable,
+                  const FloatOp &xOp, const FloatOp &yOp) const {
+  return [wTable, xOp, yOp](float pos) {
+    // Map xOp and yOp to their respective ranges
+    float xPos = ofMap(xOp(pos), 0.f, 1.f, 0.f, wTable.size() - 1);
+    float yPos = ofMap(yOp(pos), 0.f, 1.f, 0.f, wTable[0].size() - 1);
+
+    // Compute the lower indices for each axis
+    std::size_t xIndex = static_cast<std::size_t>(xPos);
+    std::size_t yIndex = static_cast<std::size_t>(yPos);
+
+    // Compute the fractional part for each axis
+    float xFrac = xPos - xIndex;
+    float yFrac = yPos - yIndex;
+
+    // Ensure indices are within bounds
+    std::size_t xIndexNext = std::min(xIndex + 1, wTable.size() - 1);
+    std::size_t yIndexNext = std::min(yIndex + 1, wTable[0].size() - 1);
+
+    // Bilinear interpolation
+    float v00 = wTable[xIndex][yIndex];
+    float v10 = wTable[xIndexNext][yIndex];
+    float v01 = wTable[xIndex][yIndexNext];
+    float v11 = wTable[xIndexNext][yIndexNext];
+
+    float c0 = ofLerp(v00, v10, xFrac);
+    float c1 = ofLerp(v01, v11, xFrac);
+
+    return ofLerp(c0, c1, yFrac);
+  };
+}
+
+FloatOp Ops::wt3d(const std::vector<std::vector<std::vector<float>>> &wTable,
+                  const FloatOp &xOp, const FloatOp &yOp,
+                  const FloatOp &zOp) const {
+  return [wTable, xOp, yOp, zOp](float pos) {
+    // Get exact positions for each axis
+    float xPos = ofMap(xOp(pos), 0.f, 1.f, 0.f, wTable.size() - 1);
+    float yPos = ofMap(yOp(pos), 0.f, 1.f, 0.f, wTable[0].size() - 1);
+    float zPos = ofMap(zOp(pos), 0.f, 1.f, 0.f, wTable[0][0].size() - 1);
+
+    // Compute the lower indices for each axis
+    std::size_t xIndex = static_cast<std::size_t>(xPos);
+    std::size_t yIndex = static_cast<std::size_t>(yPos);
+    std::size_t zIndex = static_cast<std::size_t>(zPos);
+
+    // Compute the fractional part for each axis
+    float xFrac = xPos - xIndex;
+    float yFrac = yPos - yIndex;
+    float zFrac = zPos - zIndex;
+
+    // Ensure indices are within bounds
+    std::size_t xIndexNext = std::min(xIndex + 1, wTable.size() - 1);
+    std::size_t yIndexNext = std::min(yIndex + 1, wTable[0].size() - 1);
+    std::size_t zIndexNext = std::min(zIndex + 1, wTable[0][0].size() - 1);
+
+    // Trilinear interpolation
+    float v000 = wTable[xIndex][yIndex][zIndex];
+    float v100 = wTable[xIndexNext][yIndex][zIndex];
+    float v010 = wTable[xIndex][yIndexNext][zIndex];
+    float v001 = wTable[xIndex][yIndex][zIndexNext];
+    float v101 = wTable[xIndexNext][yIndex][zIndexNext];
+    float v011 = wTable[xIndex][yIndexNext][zIndexNext];
+    float v110 = wTable[xIndexNext][yIndexNext][zIndex];
+    float v111 = wTable[xIndexNext][yIndexNext][zIndexNext];
+
+    float c00 = ofLerp(v000, v100, xFrac);
+    float c01 = ofLerp(v001, v101, xFrac);
+    float c10 = ofLerp(v010, v110, xFrac);
+    float c11 = ofLerp(v011, v111, xFrac);
+
+    float c0 = ofLerp(c00, c10, yFrac);
+    float c1 = ofLerp(c01, c11, yFrac);
+
+    return ofLerp(c0, c1, zFrac);
   };
 }
 

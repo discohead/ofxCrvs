@@ -15,21 +15,27 @@ float Crv::apply(float pos) const { return calculate(pos); }
 
 float Crv::ampBias(float value, float pos) const {
   float ampFactor = ampOffset;
-  if (ampCrv != nullptr) ampFactor *= ampCrv->yAt(pos);
+  if (ampCrv != nullptr)
+    ampFactor *= ampCrv->yAt(pos);
   ampFactor = ampFactor / 2.f;
   value = value * ampFactor + ampFactor;
-  if (biasCrv != nullptr) value += biasCrv->yAt(pos);
+  if (biasCrv != nullptr)
+    value += biasCrv->yAt(pos);
   return value + biasOffset;
 }
 
 float Crv::calcPos(float pos) const {
   pos = abs(pos);
   pos *= rateOffset;
-  if (pos > 1.f) pos = fmod(pos, 1.f);
-  if (rateCrv != nullptr) pos *= rateCrv->yAt(pos);
-  if (phaseCrv != nullptr) pos += phaseCrv->yAt(pos);
+  if (pos > 1.f)
+    pos = fmod(pos, 1.f);
+  if (rateCrv != nullptr)
+    pos *= rateCrv->yAt(pos);
+  if (phaseCrv != nullptr)
+    pos += phaseCrv->yAt(pos);
   pos += phaseOffset;
-  if (pos > 1.f) pos = fmod(pos, 1.f);
+  if (pos > 1.f)
+    pos = fmod(pos, 1.f);
   return pos;
 }
 
@@ -79,7 +85,8 @@ float Crv::wrap(float value, float min, float max) const {
 float Crv::fold(float value, float min, float max) const {
   float range = max - min;
   float foldedValue = fmod((value - min), (2 * range));
-  if (foldedValue < 0) foldedValue += 2 * range;
+  if (foldedValue < 0)
+    foldedValue += 2 * range;
   return max - abs(foldedValue - range);
 }
 
@@ -102,7 +109,8 @@ vector<glm::vec2> Crv::glv2Array(int numPoints, bool boxed, bool transformed,
   vector<glm::vec2> points(numPoints);
   for (int i = 0; i < numPoints; ++i) {
     float x = static_cast<float>(i) / (numPoints - 1);
-    if (samplingRateOp != nullptr) x = samplingRateOp(x);
+    if (samplingRateOp != nullptr)
+      x = samplingRateOp(x);
     glm::vec3 v;
     if (boxed)
       v = wVector(x, transformed);
@@ -118,7 +126,8 @@ vector<glm::vec3> Crv::glv3Array(int numPoints, bool boxed, bool transformed,
   vector<glm::vec3> vectors(numPoints);
   for (int i = 0; i < numPoints; ++i) {
     float x = static_cast<float>(i) / (numPoints - 1);
-    if (samplingRateOp != nullptr) x = samplingRateOp(x);
+    if (samplingRateOp != nullptr)
+      x = samplingRateOp(x);
     if (boxed)
       vectors[i] = wVector(x, transformed);
     else
@@ -128,9 +137,20 @@ vector<glm::vec3> Crv::glv3Array(int numPoints, bool boxed, bool transformed,
   return vectors;
 }
 
-vector<vector<float>> Crv::coordinateArray(int numPoints, bool boxed,
-                                           bool transformed,
-                                           FloatOp samplingRateOp) const {
+vector<vector<float>> Crv::f2dArray(int numPoints, bool boxed, bool transformed,
+                                    FloatOp samplingRateOp) const {
+  vector<glm::vec2> vectors =
+      glv2Array(numPoints, boxed, transformed, samplingRateOp);
+  vector<vector<float>> points(numPoints, vector<float>(2));
+  for (int i = 0; i < numPoints; ++i) {
+    points[i][0] = vectors[i].x;
+    points[i][1] = vectors[i].y;
+  }
+  return points;
+}
+
+vector<vector<float>> Crv::f3dArray(int numPoints, bool boxed, bool transformed,
+                                    FloatOp samplingRateOp) const {
   vector<glm::vec3> vectors =
       glv3Array(numPoints, boxed, transformed, samplingRateOp);
   vector<vector<float>> points(numPoints, vector<float>(3));
@@ -147,7 +167,8 @@ vector<ofVec3f> Crv::ofv3Array(int numPoints, bool boxed, bool transformed,
   vector<ofVec3f> vectors(numPoints);
   for (int i = 0; i < numPoints; ++i) {
     float x = static_cast<float>(i) / (numPoints - 1);
-    if (samplingRateOp != nullptr) x = samplingRateOp(x);
+    if (samplingRateOp != nullptr)
+      x = samplingRateOp(x);
     glm::vec3 v;
     if (boxed)
       v = wVector(x, transformed);
@@ -163,7 +184,8 @@ vector<ofVec2f> Crv::ofv2Array(int numPoints, bool boxed, bool transformed,
   vector<ofVec2f> vectors(numPoints);
   for (int i = 0; i < numPoints; ++i) {
     float x = static_cast<float>(i) / (numPoints - 1);
-    if (samplingRateOp != nullptr) x = samplingRateOp(x);
+    if (samplingRateOp != nullptr)
+      x = samplingRateOp(x);
     glm::vec3 v;
     if (boxed)
       v = wVector(x, transformed);
@@ -188,7 +210,8 @@ glm::vec3 Crv::uVector(float pos, bool transformed) const {
   float y = yAt(pos);
   float z = zAt(pos);
   glm::vec3 v = glm::vec3(x, y, z);
-  if (transformed) Utils::transform(v, UCENTER, scale, translation, rotation);
+  if (transformed)
+    Utils::transform(v, UCENTER, scale, translation, rotation);
   bounded(v);
   return v;
 }
@@ -199,36 +222,36 @@ glm::vec3 Crv::wVector(float pos, bool transformed) const {
   return v;
 }
 
-void Crv::bounded(glm::vec3& v) const {
+void Crv::bounded(glm::vec3 &v) const {
   switch (bounding) {
-    case Bounding::CLIPPING:
-      glm::vec3(ofClamp(v.x, 0.f, 1.f), ofClamp(v.y, 0.f, 1.f),
-                ofClamp(v.z, 0.f, 1.f));
-      break;
-    case Bounding::WRAPPING:
-      wrapped(v);
-      break;
-    case Bounding::FOLDING:
-      folded(v);
-      break;
-    default:
-      break;
+  case Bounding::CLIPPING:
+    glm::vec3(ofClamp(v.x, 0.f, 1.f), ofClamp(v.y, 0.f, 1.f),
+              ofClamp(v.z, 0.f, 1.f));
+    break;
+  case Bounding::WRAPPING:
+    wrapped(v);
+    break;
+  case Bounding::FOLDING:
+    folded(v);
+    break;
+  default:
+    break;
   }
 }
 
-void Crv::wrapped(glm::vec3& v) const {
+void Crv::wrapped(glm::vec3 &v) const {
   v.x = wrap(v.x, 0.f, 1.f);
   v.y = wrap(v.y, 0.f, 1.f);
   v.z = wrap(v.z, 0.f, 1.f);
 }
 
-void Crv::folded(glm::vec3& v) const {
+void Crv::folded(glm::vec3 &v) const {
   v.x = fold(v.x, 0.f, 1.f);
   v.y = fold(v.y, 0.f, 1.f);
   v.z = fold(v.z, 0.f, 1.f);
 }
 
-void Crv::boxed(glm::vec3& v) const { box.apply(v); }
+void Crv::boxed(glm::vec3 &v) const { box.apply(v); }
 
 vector<Edg> Crv::getWebEdgs(int numPoints, bool boxed, bool transformed,
                             int resolution) const {
@@ -248,4 +271,4 @@ vector<Edg> Crv::getWebEdgs(int numPoints, bool boxed, bool transformed) const {
   return getWebEdgs(numPoints, boxed, transformed, resolution);
 }
 
-}  // namespace ofxCrvs
+} // namespace ofxCrvs

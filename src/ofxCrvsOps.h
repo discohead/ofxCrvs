@@ -11,13 +11,7 @@ using FloatOp = std::function<float(const float)>;
 
 class Ops {
 public:
-  Ops() {
-    table.resize(1024);
-    for (int i = 0; i < 1024; i++) {
-      table[i] = ofRandom(1.0f);
-    }
-  };
-  explicit Ops(const vector<float> &table) : table(table){};
+  static float pos2Rad(float pos);
 
   [[nodiscard]] FloatOp zero() const {
     return [](const float) { return 0.0f; };
@@ -71,12 +65,10 @@ public:
     return [](const float) { return static_cast<float>(ofGetMouseY()); };
   };
 
-  static float pos2Rad(float pos);
-
   [[nodiscard]] FloatOp bipolarize(const FloatOp &unipolarOp) const;
   [[nodiscard]] FloatOp rectify(const FloatOp &bipolarOp) const;
   [[nodiscard]] FloatOp c(float value) const;
-  [[nodiscard]] FloatOp framePhasor(const int framesPerCycle) const;
+  [[nodiscard]] FloatOp framePhasor(float cyclesPerSecond) const;
   [[nodiscard]] FloatOp phasor() const;
   [[nodiscard]] FloatOp saw() const;
   [[nodiscard]] FloatOp tri(const FloatOp &s) const;
@@ -94,9 +86,15 @@ public:
   [[nodiscard]] FloatOp tan(float fb) const;
   [[nodiscard]] FloatOp tan() const;
 
-  vector<float> table;
-  [[nodiscard]] FloatOp wavetable() const;
-  [[nodiscard]] FloatOp lookup() const;
+  [[nodiscard]] FloatOp wt(const std::vector<float> &wTable) const;
+  [[nodiscard]] FloatOp wt(const std::vector<float> &wTable,
+                           const FloatOp &xOp) const;
+  [[nodiscard]] FloatOp wt2d(const std::vector<std::vector<float>> &wTable,
+                             const FloatOp &xOp, const FloatOp &yOp) const;
+  [[nodiscard]] FloatOp
+  wt3d(const std::vector<std::vector<std::vector<float>>> &wTable,
+       const FloatOp &xOp, const FloatOp &yOp, const FloatOp &zOp) const;
+  [[nodiscard]] FloatOp lookup(const std::vector<float> &table) const;
 
   [[nodiscard]] FloatOp easeIn(const FloatOp &e) const;
   [[nodiscard]] FloatOp easeIn() const;
@@ -115,7 +113,6 @@ public:
   [[nodiscard]] FloatOp env(float attackLength, float attackLevel,
                             float decayLength, float sustainLength,
                             float sustainLevel, float releaseLength) const;
-
   [[nodiscard]] FloatOp breakpoints(const vector<vector<float>> &points) const;
   [[nodiscard]] FloatOp timeseries(const vector<float> &yValues) const;
 
