@@ -86,15 +86,24 @@ public:
   [[nodiscard]] FloatOp tan(float fb) const;
   [[nodiscard]] FloatOp tan() const;
 
+  [[nodiscard]] FloatOp lookup(const std::vector<float> &table) const;
+  [[nodiscard]] FloatOp lookup(const std::vector<FloatOp> &table) const;
   [[nodiscard]] FloatOp wt(const std::vector<float> &wTable) const;
+  [[nodiscard]] FloatOp wt(const std::vector<FloatOp> &wTable) const;
   [[nodiscard]] FloatOp wt(const std::vector<float> &wTable,
                            const FloatOp &xOp) const;
+  [[nodiscard]] FloatOp wt(const std::vector<FloatOp> &wTable,
+                           const FloatOp &xOp) const;
   [[nodiscard]] FloatOp wt2d(const std::vector<std::vector<float>> &wTable,
+                             const FloatOp &xOp, const FloatOp &yOp) const;
+  [[nodiscard]] FloatOp wt2d(const std::vector<std::vector<FloatOp>> &wTable,
                              const FloatOp &xOp, const FloatOp &yOp) const;
   [[nodiscard]] FloatOp
   wt3d(const std::vector<std::vector<std::vector<float>>> &wTable,
        const FloatOp &xOp, const FloatOp &yOp, const FloatOp &zOp) const;
-  [[nodiscard]] FloatOp lookup(const std::vector<float> &table) const;
+  [[nodiscard]] FloatOp
+  wt3d(const std::vector<std::vector<std::vector<FloatOp>>> &wOpTable,
+       const FloatOp &xOp, const FloatOp &yOp, const FloatOp &zOp) const;
 
   [[nodiscard]] FloatOp easeIn(const FloatOp &e) const;
   [[nodiscard]] FloatOp easeIn() const;
