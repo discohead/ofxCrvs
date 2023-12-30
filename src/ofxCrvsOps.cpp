@@ -430,20 +430,45 @@ FloatOp Ops::phase(const FloatOp &op, const FloatOp &phaseOffset) const {
 }
 
 FloatOp Ops::rate(const FloatOp &op, const float rateOffset) const {
-  return [op, rateOffset](const float pos) {
-    float modPos = pos * rateOffset;
-    if (modPos > 1.f)
-      modPos = fmod(pos, 1.f);
-    return op(modPos);
+  return [op, rateOffset](const float pos) mutable {
+    if (rateOffset == 0.f)
+      return 0.f;
+    static float accumulatedPos = 0.f;
+
+    // Update accumulated position
+    accumulatedPos += pos * rateOffset;
+
+    // Wrap accumulated position if it exceeds 1.0 or drops below 0.0
+    while (accumulatedPos > 1.f) {
+      accumulatedPos -= 1.f;
+    }
+    while (accumulatedPos < 0.f) {
+      accumulatedPos += 1.f;
+    }
+
+    return op(accumulatedPos);
   };
 }
 
 FloatOp Ops::rate(const FloatOp &op, const FloatOp &rateOffset) const {
-  return [op, rateOffset](const float pos) {
-    float modPos = pos * rateOffset(pos);
-    if (modPos > 1.f)
-      modPos = fmod(pos, 1.f);
-    return op(modPos);
+  return [op, rateOffset](const float pos) mutable {
+    const float rateOffsetVal = rateOffset(pos);
+    if (rateOffsetVal == 0.f)
+      return 0.f;
+    static float accumulatedPos = 0.f;
+
+    // Update accumulated position
+    accumulatedPos += pos * rateOffsetVal;
+
+    // Wrap accumulated position if it exceeds 1.0 or drops below 0.0
+    while (accumulatedPos > 1.f) {
+      accumulatedPos -= 1.f;
+    }
+    while (accumulatedPos < 0.f) {
+      accumulatedPos += 1.f;
+    }
+
+    return op(accumulatedPos);
   };
 }
 
