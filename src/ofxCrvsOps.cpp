@@ -846,6 +846,33 @@ FloatOp Ops::diff(const FloatOp &opA, const FloatOp &opB) const {
   return [opA, opB](const float pos) { return opA(pos) - opB(pos); };
 }
 
+FloatOp Ops::crossed(const FloatOp &opA, const FloatOp &opB) const {
+  float aGreaterThanB = -1.f;
+  return [opA, opB, aGreaterThanB](const float pos) mutable {
+    const float a = opA(pos);
+    const float b = opB(pos);
+    if (aGreaterThanB == -1.f) {
+      aGreaterThanB = a > b ? 1.f : 0.f;
+      return 0.f;
+    }
+    if (a > b) {
+      if (aGreaterThanB == 1.f) {
+        return 0.f;
+      } else {
+        aGreaterThanB = 1.f;
+        return 1.f;
+      }
+    } else {
+      if (aGreaterThanB == 1.f) {
+        aGreaterThanB = 0.f;
+        return 1.f;
+      } else {
+        return 0.f;
+      }
+    }
+  };
+}
+
 FloatOp Ops::greater(const FloatOp &opA, const FloatOp &opB) const {
   return
       [opA, opB](const float pos) { return opA(pos) > opB(pos) ? 1.f : 0.f; };

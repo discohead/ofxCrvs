@@ -199,6 +199,7 @@ public:
   [[nodiscard]] FloatOp pulse(const FloatOp &w = FloatOp()) const;
   [[nodiscard]] FloatOp pulse(float w) const;
   [[nodiscard]] FloatOp square() const;
+  [[nodiscard]] FloatOp crossed(const FloatOp &opA, const FloatOp &opB) const;
   [[nodiscard]] FloatOp greater(const FloatOp &opA, const FloatOp &opB) const;
   [[nodiscard]] FloatOp greater(const FloatOp &opA, float threshold) const;
   [[nodiscard]] FloatOp less(const FloatOp &opA, const FloatOp &opB) const;
