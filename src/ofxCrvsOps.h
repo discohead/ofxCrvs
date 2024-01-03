@@ -77,6 +77,8 @@ public:
   [[nodiscard]] FloatOp sine(const FloatOp &fb) const;
   [[nodiscard]] FloatOp sine() const;
   [[nodiscard]] FloatOp sine(float fb) const;
+  [[nodiscard]] FloatOp sineFb(const FloatOp &fb) const;
+  [[nodiscard]] FloatOp sineFb(float fb = 0.f) const;
   [[nodiscard]] FloatOp asin() const;
   [[nodiscard]] FloatOp cos(const FloatOp &fb) const;
   [[nodiscard]] FloatOp cos(float fb) const;
@@ -147,6 +149,7 @@ public:
                                const FloatOp &z = FloatOp(),
                                const FloatOp &falloff = FloatOp(),
                                const FloatOp &octaves = FloatOp()) const;
+  [[nodiscard]] FloatOp fuzz(const float fuzzScale) const;
 
   // Basic ops
   [[nodiscard]] FloatOp abs(const FloatOp &op) const;
@@ -168,6 +171,9 @@ public:
   [[nodiscard]] FloatOp wrap(const FloatOp &op, const FloatOp &minOp,
                              const FloatOp &maxOp) const;
   [[nodiscard]] FloatOp lpf(const FloatOp &inputOp, int windowSize) const;
+  [[nodiscard]] FloatOp lpFb(float smoothing, float resonance) const;
+  [[nodiscard]] FloatOp ampFb(float feedbackStrength, float damping,
+                              const FloatOp &inputOp = FloatOp()) const;
   [[nodiscard]] FloatOp morph(const FloatOp &opA, const FloatOp &opB,
                               const FloatOp &morphParam) const;
 

@@ -64,6 +64,46 @@ FloatOp Ops::sine(const FloatOp &fb) const {
   };
 }
 
+FloatOp Ops::sineFb(const FloatOp &fb) const {
+  return [fb, lastFeedback = 0.0f](const float pos) mutable -> float {
+    float modPos = pos;
+
+    // Calculate the current feedback scale
+    float currentFeedback = fb ? fb(pos) : 0.0f;
+
+    // Apply the feedback to modPos
+    modPos += lastFeedback;
+
+    // Compute the sine wave with modulated position
+    float output = (std::sin(pos2Rad(fmod(modPos, 1.f))) * 0.5f) + 0.5f;
+
+    // Update the lastFeedback for the next call
+    // The feedback effect is based on the current output scaled by
+    // currentFeedback
+    lastFeedback = currentFeedback * output;
+
+    return output;
+  };
+}
+
+FloatOp Ops::sineFb(const float fb) const {
+  return [fb, lastFeedback = 0.0f](const float pos) mutable -> float {
+    float modPos = pos;
+
+    // Apply the feedback to modPos
+    modPos += lastFeedback;
+
+    // Compute the sine wave with modulated position
+    float output = (std::sin(pos2Rad(fmod(modPos, 1.f))) * 0.5f) + 0.5f;
+
+    // Update the lastFeedback for the next call
+    // The feedback effect is based on the current output scaled by fb
+    lastFeedback = fb * output;
+
+    return output;
+  };
+}
+
 FloatOp Ops::sine() const { return sine(FloatOp()); }
 
 FloatOp Ops::sine(const float fb) const { return sine(c(fb)); }
@@ -104,7 +144,7 @@ FloatOp Ops::tan(const FloatOp &fb) const {
       const float fbScale = fb(pos);
       modPos += fbScale * (std::tan(pos2Rad(modPos)) * 0.5f) + 0.5f;
     }
-    return (std::tan(pos2Rad(fmod(pos, 1.f))) * 0.5f) + 0.5f;
+    return (std::tan(pos2Rad(fmod(modPos, 1.f))) * 0.5f) + 0.5f;
   };
 }
 
@@ -520,6 +560,16 @@ FloatOp Ops::perlin(const FloatOp &x, const FloatOp &y, const FloatOp &z,
   };
 }
 
+FloatOp Ops::fuzz(const float fuzzScale) const {
+  return [fuzzScale](const float pos) -> float {
+    // Generate Perlin noise and scale it by fuzzScale
+    float noise = ofNoise(pos) * fuzzScale;
+
+    // Add the scaled noise to the input position
+    return pos + noise;
+  };
+}
+
 FloatOp Ops::mult(const FloatOp &op, const float scalar) const {
   return [op, scalar](const float pos) { return op(pos) * scalar; };
 }
@@ -535,8 +585,9 @@ FloatOp Ops::bias(const FloatOp &op, const FloatOp &offset) const {
 FloatOp Ops::phase(const FloatOp &op, const float phaseOffset) const {
   return [op, phaseOffset](const float pos) {
     float modPos = pos + phaseOffset;
-    if (modPos > 1.f)
-      modPos = fmod(pos, 1.f);
+    if (modPos > 1.f) {
+      modPos = fmod(modPos, 1.f);
+    }
     return op(modPos);
   };
 }
@@ -545,7 +596,7 @@ FloatOp Ops::phase(const FloatOp &op, const FloatOp &phaseOffset) const {
   return [op, phaseOffset](const float pos) {
     float modPos = pos + phaseOffset(pos);
     if (modPos > 1.f)
-      modPos = fmod(pos, 1.f);
+      modPos = fmod(modPos, 1.f);
     return op(modPos);
   };
 }
@@ -666,6 +717,43 @@ FloatOp Ops::lpf(const FloatOp &inputOp, const int windowSize) const {
       sum += inputOp(offsetPos);
     }
     return sum / windowSize;
+  };
+}
+
+FloatOp Ops::lpFb(float smoothing, float resonance) const {
+  return [smoothing, resonance,
+          lastOutput = 0.0f](const float input) mutable -> float {
+    // Calculate the feedback amount
+    float feedback = resonance * lastOutput;
+
+    // Apply the low-pass filter formula with resonance
+    lastOutput =
+        smoothing * (input + feedback) + (1.0f - smoothing) * lastOutput;
+
+    // Ensure the output is bounded, if necessary
+    lastOutput = std::clamp(lastOutput, -1.0f, 1.0f);
+
+    return lastOutput;
+  };
+}
+
+FloatOp Ops::ampFb(float feedbackStrength, float damping,
+                   const FloatOp &inputOp) const {
+  return [inputOp, feedbackStrength, damping,
+          lastOutput = 0.0f](const float pos) mutable -> float {
+    // Get the current input value
+    float input = inputOp ? inputOp(pos) : pos;
+
+    // Apply feedback to the input
+    float modulatedInput = input + lastOutput * feedbackStrength;
+
+    // Compute the output with some damping to stabilize the feedback loop
+    float output = modulatedInput * (1.0f - damping);
+
+    // Update the last output for the next iteration
+    lastOutput = output;
+
+    return output;
   };
 }
 
@@ -847,29 +935,25 @@ FloatOp Ops::diff(const FloatOp &opA, const FloatOp &opB) const {
 }
 
 FloatOp Ops::crossed(const FloatOp &opA, const FloatOp &opB) const {
-  float aGreaterThanB = -1.f;
-  return [opA, opB, aGreaterThanB](const float pos) mutable {
+  return [opA, opB,
+          lastComparison = std::optional<bool>()](const float pos) mutable {
     const float a = opA(pos);
     const float b = opB(pos);
-    if (aGreaterThanB == -1.f) {
-      aGreaterThanB = a > b ? 1.f : 0.f;
+    bool aGreaterThanB = a > b;
+
+    if (!lastComparison.has_value()) {
+      // Initialize the state during the first call
+      lastComparison = aGreaterThanB;
       return 0.f;
     }
-    if (a > b) {
-      if (aGreaterThanB == 1.f) {
-        return 0.f;
-      } else {
-        aGreaterThanB = 1.f;
-        return 1.f;
-      }
-    } else {
-      if (aGreaterThanB == 1.f) {
-        aGreaterThanB = 0.f;
-        return 1.f;
-      } else {
-        return 0.f;
-      }
+
+    if (aGreaterThanB != lastComparison) {
+      // A crossing has occurred
+      lastComparison = aGreaterThanB;
+      return 1.f;
     }
+
+    return 0.f; // No crossing
   };
 }
 
@@ -932,7 +1016,7 @@ FloatOp Ops::and_(const FloatOp &opA, const FloatOp &opB,
     const float a = opA(pos);
     const float b = opB(pos);
     const float t = threshold(pos);
-    return a > t || b > t ? 1.f : 0.f;
+    return a > t && b > t ? 1.f : 0.f;
   };
 }
 

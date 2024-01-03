@@ -11,23 +11,14 @@
 
 namespace ofxCrvs {
 
-void Box::apply(glm::vec3& v) const {
-  float w = getWidth();
-  float h = getHeight();
-  float d = getDepth();
-
+void Box::apply(glm::vec3 &v) const {
   // Scale
-  v.x *= w;
-  v.y *= h;
-  v.z *= d;
-
-  // Translate to center
-  v.x -= w * 0.5f;
-  v.y -= h * 0.5f;
-  v.z -= d * 0.5f;
+  v.x *= getWidth();
+  v.y *= getHeight();
+  v.z *= getDepth();
 
   // Apply transformation
   v = glm::vec3(getLocalTransformMatrix() * glm::vec4(v, 1.0));
 }
 
-}  // namespace ofxCrvs
+} // namespace ofxCrvs

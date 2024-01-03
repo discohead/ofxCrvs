@@ -23,7 +23,11 @@ enum class Component {
   /**
    * Z Component.
    */
-  Z
+  Z,
+  /**
+   * W Component.
+   */
+  W,
 };
 
 enum class Bounding {
@@ -48,6 +52,11 @@ public:
   float rateOffset = 1.0f;
   float phaseOffset = 0.0f;
   float biasOffset = 0.0f;
+
+  float ampModAmt = 1.0f;
+  float rateModAmt = 1.0f;
+  float phaseModAmt = 1.0f;
+  float biasModAmt = 1.0f;
 
   int resolution;
   int quantization;
@@ -129,6 +138,7 @@ public:
   float xAt(float pos) const;
   float yAt(float pos) const;
   float zAt(float pos) const;
+  float wAt(float pos) const;
   float bipolarize(float unipolar) const;
   float wrap(float value, float min, float max) const;
   float fold(float value, float min, float max) const;

@@ -15,12 +15,12 @@ float Crv::apply(float pos) const { return calculate(pos); }
 
 float Crv::ampBias(float value, float pos) const {
   float ampFactor = ampOffset;
-  if (ampCrv != nullptr)
-    ampFactor *= ampCrv->yAt(pos);
+  if (ampCrv)
+    ampFactor *= ampCrv->yAt(pos) * ampModAmt;
   ampFactor = ampFactor / 2.f;
   value = value * ampFactor + ampFactor;
-  if (biasCrv != nullptr)
-    value += biasCrv->yAt(pos);
+  if (biasCrv)
+    value += biasCrv->yAt(pos) * biasModAmt;
   return value + biasOffset;
 }
 
@@ -29,10 +29,10 @@ float Crv::calcPos(float pos) const {
   pos *= rateOffset;
   if (pos > 1.f)
     pos = fmod(pos, 1.f);
-  if (rateCrv != nullptr)
-    pos *= rateCrv->yAt(pos);
-  if (phaseCrv != nullptr)
-    pos += phaseCrv->yAt(pos);
+  if (rateCrv)
+    pos *= rateCrv->yAt(pos) * rateModAmt;
+  if (phaseCrv)
+    pos += phaseCrv->yAt(pos) * phaseModAmt;
   pos += phaseOffset;
   if (pos > 1.f)
     pos = fmod(pos, 1.f);
@@ -57,6 +57,8 @@ float Crv::xAt(float pos) const { return componentAt(Component::X, pos); }
 float Crv::yAt(float pos) const { return componentAt(Component::Y, pos); }
 
 float Crv::zAt(float pos) const { return componentAt(Component::Z, pos); }
+
+float Crv::wAt(float pos) const { return componentAt(Component::W, pos); }
 
 float Crv::quantize(float y) const {
   if (quantization > 1) {
@@ -109,7 +111,7 @@ vector<glm::vec2> Crv::glv2Array(int numPoints, bool boxed, bool transformed,
   vector<glm::vec2> points(numPoints);
   for (int i = 0; i < numPoints; ++i) {
     float x = static_cast<float>(i) / (numPoints - 1);
-    if (samplingRateOp != nullptr)
+    if (samplingRateOp)
       x = samplingRateOp(x);
     glm::vec3 v;
     if (boxed)
@@ -126,7 +128,7 @@ vector<glm::vec3> Crv::glv3Array(int numPoints, bool boxed, bool transformed,
   vector<glm::vec3> vectors(numPoints);
   for (int i = 0; i < numPoints; ++i) {
     float x = static_cast<float>(i) / (numPoints - 1);
-    if (samplingRateOp != nullptr)
+    if (samplingRateOp)
       x = samplingRateOp(x);
     if (boxed)
       vectors[i] = wVector(x, transformed);
@@ -167,7 +169,7 @@ vector<ofVec3f> Crv::ofv3Array(int numPoints, bool boxed, bool transformed,
   vector<ofVec3f> vectors(numPoints);
   for (int i = 0; i < numPoints; ++i) {
     float x = static_cast<float>(i) / (numPoints - 1);
-    if (samplingRateOp != nullptr)
+    if (samplingRateOp)
       x = samplingRateOp(x);
     glm::vec3 v;
     if (boxed)
@@ -184,7 +186,7 @@ vector<ofVec2f> Crv::ofv2Array(int numPoints, bool boxed, bool transformed,
   vector<ofVec2f> vectors(numPoints);
   for (int i = 0; i < numPoints; ++i) {
     float x = static_cast<float>(i) / (numPoints - 1);
-    if (samplingRateOp != nullptr)
+    if (samplingRateOp)
       x = samplingRateOp(x);
     glm::vec3 v;
     if (boxed)
@@ -199,7 +201,7 @@ vector<ofVec2f> Crv::ofv2Array(int numPoints, bool boxed, bool transformed,
 ofPolyline Crv::polyline(int numPoints, bool boxed, bool transformed,
                          FloatOp samplingRateOp) const {
   vector<glm::vec3> vectors =
-      glv3Array(numPoints, boxed, transformed, samplingRateOp);
+      glv3Array(numPoints, boxed, transformed, std::move(samplingRateOp));
   ofPolyline polyline;
   polyline.addVertices(vectors);
   return polyline;

@@ -5,6 +5,7 @@
 #include "ofxCrvsConstants.h"
 #include "ofxCrvsCrv.h"
 #include "ofxCrvsEdg.hpp"
+#include "ofxCrvsHypr.h"
 #include "ofxCrvsLsjs.hpp"
 #include "ofxCrvsOps.h"
 #include "ofxCrvsUtils.hpp"
