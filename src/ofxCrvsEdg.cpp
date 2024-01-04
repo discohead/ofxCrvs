@@ -27,9 +27,9 @@ glm::vec3 Edg::midpoint() const { return at(0.5); }
 
 void Edg::transformed() {
   Utils::transform(source, midpoint(), scale, translation, rotation,
-                   Utils::zAxis);
+                   glm::vec3(0.f, 0.f, 1.f));
   Utils::transform(target, midpoint(), scale, translation, rotation,
-                   Utils::zAxis);
+                   glm::vec3(0.f, 0.f, 1.f));
 }
 
 std::vector<glm::vec3> Edg::points() const { return points(resolution); }
@@ -55,8 +55,8 @@ glm::vec3 Edg::getPerpendicularPoint(glm::vec3 point, float magnitude) const {
   if (glm::length(dir - arbitraryAxis) < 0.0001f ||
       glm::length(dir + arbitraryAxis) < 0.0001f) {
     arbitraryAxis =
-        glm::vec3(0.0f, 1.0f, 0.0f);  // Choose a different axis if 'dir' is
-                                      // parallel to the initial arbitraryAxis
+        glm::vec3(0.0f, 1.0f, 0.0f); // Choose a different axis if 'dir' is
+                                     // parallel to the initial arbitraryAxis
   }
   glm::vec3 rotationAxis = glm::cross(dir, arbitraryAxis);
   rotationAxis = glm::normalize(rotationAxis);
@@ -85,4 +85,4 @@ std::vector<glm::vec3> Edg::getCrvPoints(Crv crv) const {
 
 glm::vec3 Edg::asVector() const { return target - source; }
 
-}  // namespace ofxCrvs
+} // namespace ofxCrvs

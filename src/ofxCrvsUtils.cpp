@@ -20,13 +20,13 @@ void Utils::transform(glm::vec3& vector, const glm::vec3& center,
     vector += center;
   }
 
-  if (scale != Utils::noScale) {
+  if (scale != glm::vec3(1.f)) {
     vector.x *= scale.x;
     vector.y *= scale.y;
     vector.z *= scale.z;
   }
 
-  if (translation != Utils::noTranslation) {
+  if (translation != glm::vec3(0.f)) {
     vector += translation;
   }
 }

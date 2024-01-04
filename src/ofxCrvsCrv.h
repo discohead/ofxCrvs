@@ -39,8 +39,6 @@ enum class Bounding {
 
 class Crv {
 public:
-  constexpr static glm::vec3 uCenter = glm::vec3(0.5f);
-
   Box box;
   FloatOp op;
   std::shared_ptr<Crv> ampCrv;

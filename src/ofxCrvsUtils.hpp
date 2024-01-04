@@ -16,27 +16,23 @@
 namespace ofxCrvs {
 
 class Utils {
- public:
-  static constexpr glm::vec3 uCenter = glm::vec3(0.5f);
-  static constexpr glm::vec3 noScale = glm::vec3(1.f);
-  static constexpr glm::vec3 noTranslation = glm::vec3(0.f);
-  static constexpr glm::vec3 zAxis = glm::vec3(0.f, 0.f, 1.f);
+public:
+  static void
+  transform(glm::vec3 &vector, const glm::vec3 &center, const glm::vec3 &scale,
+            const glm::vec3 &translation, float rotationDegrees,
+            const glm::vec3 &rotationAxis = glm::vec3(0.f, 0.f, 1.f));
 
-  static void transform(glm::vec3& vector, const glm::vec3& center,
-                        const glm::vec3& scale, const glm::vec3& translation,
+  static void transform(std::vector<glm::vec3> vectors, const glm::vec3 &center,
+                        const glm::vec3 &scale, const glm::vec3 &translation,
                         float rotationDegrees,
-                        const glm::vec3& rotationAxis = Utils::zAxis);
+                        const glm::vec3 &rotationAxis = glm::vec3(0.f, 0.f,
+                                                                  1.f));
 
-  static void transform(std::vector<glm::vec3> vectors, const glm::vec3& center,
-                        const glm::vec3& scale, const glm::vec3& translation,
-                        float rotationDegrees,
-                        const glm::vec3& rotationAxis = Utils::zAxis);
+  static void clipped(glm::vec3 &point, const ofBoxPrimitive &box);
 
-  static void clipped(glm::vec3& point, const ofBoxPrimitive& box);
-
-  static void rotateVector(glm::vec3& vec, float angleDegrees);
+  static void rotateVector(glm::vec3 &vec, float angleDegrees);
 };
 
-}  // namespace ofxCrvs
+} // namespace ofxCrvs
 
 #endif /* ofxCrvsUtils_hpp */

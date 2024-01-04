@@ -601,45 +601,34 @@ FloatOp Ops::phase(const FloatOp &op, const FloatOp &phaseOffset) const {
   };
 }
 
-FloatOp Ops::rate(const FloatOp &op, const float rateOffset) const {
-  float accumulatedPos = 0.f;
-  return [op, rateOffset, accumulatedPos](const float pos) mutable {
-    if (rateOffset == 0.f)
-      return 0.f;
-
-    // Update accumulated position
-    accumulatedPos += pos * rateOffset;
-
-    // Wrap accumulated position if it exceeds 1.0 or drops below 0.0
-    while (accumulatedPos > 1.f) {
-      accumulatedPos -= 1.f;
-    }
-    while (accumulatedPos < 0.f) {
-      accumulatedPos += 1.f;
-    }
-
+FloatOp Ops::rate(const FloatOp &op, float rateOffset) const {
+  return [op, rateOffset, lastPos = 0.f,
+          accumulatedPos = 0.f](const float pos) mutable {
+    float deltaPos = pos - lastPos;
+    lastPos = pos;
+    if (deltaPos < 0.f)
+      deltaPos += 1.f;
+    float modDelta = deltaPos * rateOffset;
+    accumulatedPos += modDelta;
+    if (accumulatedPos > 1.f)
+      accumulatedPos = fmod(accumulatedPos, 1.f);
+    float v = op(accumulatedPos);
     return op(accumulatedPos);
   };
 }
 
 FloatOp Ops::rate(const FloatOp &op, const FloatOp &rateOffset) const {
-  return [op, rateOffset](const float pos) mutable {
-    const float rateOffsetVal = rateOffset(pos);
-    if (rateOffsetVal == 0.f)
-      return 0.f;
-    static float accumulatedPos = 0.f;
-
-    // Update accumulated position
-    accumulatedPos += pos * rateOffsetVal;
-
-    // Wrap accumulated position if it exceeds 1.0 or drops below 0.0
-    while (accumulatedPos > 1.f) {
-      accumulatedPos -= 1.f;
-    }
-    while (accumulatedPos < 0.f) {
-      accumulatedPos += 1.f;
-    }
-
+  return [op, rateOffset, lastPos = 0.f,
+          accumulatedPos = 0.f](const float pos) mutable {
+    float deltaPos = pos - lastPos;
+    lastPos = pos;
+    if (deltaPos < 0.f)
+      deltaPos += 1.f;
+    float modDelta = deltaPos * rateOffset(pos);
+    accumulatedPos += modDelta;
+    if (accumulatedPos > 1.f)
+      accumulatedPos = fmod(accumulatedPos, 1.f);
+    float v = op(accumulatedPos);
     return op(accumulatedPos);
   };
 }
@@ -954,6 +943,43 @@ FloatOp Ops::crossed(const FloatOp &opA, const FloatOp &opB) const {
     }
 
     return 0.f; // No crossing
+  };
+}
+
+FloatOp Ops::trendFlip(const FloatOp &inputOp) const {
+  return [inputOp, lastValue = std::optional<float>(),
+          lastDirection =
+              std::optional<bool>()](const float pos) mutable -> float {
+    // Get the current value
+    float currentValue = inputOp(pos);
+
+    // Check if lastValue has been initialized
+    if (!lastValue.has_value()) {
+      lastValue = currentValue;
+      return 0.0f; // No direction change can be detected on the first call
+    }
+
+    // Determine the current direction (true for increasing, false for
+    // decreasing)
+    bool currentDirection = currentValue > lastValue.value();
+
+    // Check if lastDirection has been initialized
+    if (!lastDirection.has_value()) {
+      lastDirection = currentDirection;
+      lastValue = currentValue;
+      return 0.0f; // No direction change on the first valid comparison
+    }
+
+    // Check for a change in direction
+    if (currentDirection != lastDirection.value()) {
+      lastDirection = currentDirection;
+      lastValue = currentValue;
+      return 1.0f; // Direction change detected
+    }
+
+    // Update lastValue for the next call
+    lastValue = currentValue;
+    return 0.0f; // No change in direction
   };
 }
 
