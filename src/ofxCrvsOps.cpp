@@ -7,11 +7,11 @@ float Ops::pos2Rad(const float pos) {
   return ofDegToRad(ofClamp(pos, 0.f, 1.f) * 360.f);
 }
 
-FloatOp Ops::bipolarize(const FloatOp &unipolarOp) const {
+FloatOp Ops::bipolarize(const FloatOp unipolarOp) const {
   return [unipolarOp](const float pos) { return 2.f * unipolarOp(pos) - 1.f; };
 }
 
-FloatOp Ops::rectify(const FloatOp &bipolarOp) const {
+FloatOp Ops::rectify(const FloatOp bipolarOp) const {
   return [bipolarOp](const float pos) { return bipolarOp(pos) * 0.5f + 0.5f; };
 }
 
@@ -19,15 +19,42 @@ FloatOp Ops::c(const float value) const {
   return [value](const float /*pos*/) { return value; };
 }
 
-FloatOp Ops::framePhasor(const float cyclesPerSecond) const {
-  return [cyclesPerSecond](const float) {
-    double cycleDuration = 1.0 / static_cast<double>(cyclesPerSecond);
+FloatOp Ops::timePhasor(const double cycleDurationSeconds) const {
+  if (cycleDurationSeconds <= 0.0) {
+    throw std::invalid_argument("cycleDurationSeconds must be greater than 0");
+  }
+  double cycleDurationMicros = cycleDurationSeconds * 1000000.0;
+  return [cycleDurationMicros](const float) {
+    return fmod(static_cast<double>(ofGetElapsedTimeMicros()),
+                cycleDurationMicros) /
+           cycleDurationMicros;
+  };
+}
 
-    // Use microseconds for the time base
-    double currentTime =
-        ofGetElapsedTimeMicros() / 1000000.0; // Convert to seconds
+FloatOp Ops::tempoPhasor(const double barsPerCycle, const double bpm) const {
+  if (bpm <= 0.0) {
+    throw std::invalid_argument("bpm must be greater than 0");
+  }
+  if (barsPerCycle <= 0.0) {
+    throw std::invalid_argument("barsPerCycle must be greater than 0");
+  }
 
-    return fmod(currentTime, cycleDuration) / cycleDuration;
+  // Calculate the duration of one beat in seconds
+  const double beatDurationSecs = 60.0 / bpm;
+
+  // Assuming a 4/4 time signature, calculate the duration of one bar
+  const double barDurationSecs = beatDurationSecs * 4;
+
+  // Calculate the duration of the entire cycle (in seconds)
+  const double cycleDurationSecs = barDurationSecs * barsPerCycle;
+
+  // Convert cycle duration from seconds to microseconds
+  const double cycleDurationMicros = cycleDurationSecs * 1000000.0;
+
+  return [cycleDurationMicros](const float) {
+    return fmod(static_cast<double>(ofGetElapsedTimeMicros()),
+                cycleDurationMicros) /
+           cycleDurationMicros;
   };
 }
 
@@ -39,7 +66,7 @@ FloatOp Ops::saw() const {
   return [](const float pos) { return 1.f - pos; };
 }
 
-FloatOp Ops::tri(const FloatOp &s) const {
+FloatOp Ops::tri(const FloatOp s) const {
   return [s](const float pos) {
     float sValue = 0.5f;
     if (s)
@@ -53,7 +80,7 @@ FloatOp Ops::tri() const { return tri(FloatOp()); }
 
 FloatOp Ops::tri(const float s) const { return tri(c(s)); }
 
-FloatOp Ops::sine(const FloatOp &fb) const {
+FloatOp Ops::sine(const FloatOp fb) const {
   return [fb](const float pos) {
     float modPos = pos;
     if (fb) {
@@ -64,7 +91,7 @@ FloatOp Ops::sine(const FloatOp &fb) const {
   };
 }
 
-FloatOp Ops::sineFb(const FloatOp &fb) const {
+FloatOp Ops::sineFb(const FloatOp fb) const {
   return [fb, lastFeedback = 0.0f](const float pos) mutable -> float {
     float modPos = pos;
 
@@ -115,7 +142,7 @@ FloatOp Ops::asin() const {
   };
 }
 
-FloatOp Ops::cos(const FloatOp &fb) const {
+FloatOp Ops::cos(const FloatOp fb) const {
   return [fb](const float pos) {
     float modPos = pos;
     if (fb) {
@@ -137,7 +164,7 @@ FloatOp Ops::acos() const {
   };
 }
 
-FloatOp Ops::tan(const FloatOp &fb) const {
+FloatOp Ops::tan(const FloatOp fb) const {
   return [fb](const float pos) {
     float modPos = pos;
     if (fb) {
@@ -152,7 +179,7 @@ FloatOp Ops::tan() const { return tan(FloatOp()); }
 
 FloatOp Ops::tan(const float fb) const { return tan(c(fb)); }
 
-FloatOp Ops::pulse(const FloatOp &w) const {
+FloatOp Ops::pulse(const FloatOp w) const {
   return [w](const float pos) {
     float wValue = 0.5f;
     if (w)
@@ -165,7 +192,7 @@ FloatOp Ops::pulse(const float w) const { return pulse(c(w)); }
 
 FloatOp Ops::square() const { return pulse(); }
 
-FloatOp Ops::easeIn(const FloatOp &e) const {
+FloatOp Ops::easeIn(const FloatOp e) const {
   return [e](const float pos) {
     float eValue = 2.f;
     if (e)
@@ -178,7 +205,7 @@ FloatOp Ops::easeIn() const { return easeIn(FloatOp()); }
 
 FloatOp Ops::easeIn(const float e) const { return easeIn(c(e)); }
 
-FloatOp Ops::easeOut(const FloatOp &e) const {
+FloatOp Ops::easeOut(const FloatOp e) const {
   return [e](const float pos) {
     float eValue = 3.f;
     if (e)
@@ -191,7 +218,7 @@ FloatOp Ops::easeOut() const { return easeOut(FloatOp()); }
 
 FloatOp Ops::easeOut(const float e) const { return easeOut(c(e)); }
 
-FloatOp Ops::easeInOut(const FloatOp &e) const {
+FloatOp Ops::easeInOut(const FloatOp e) const {
   return [e](const float pos) {
     const float value = pos * 2.f;
     float eValue = 3.f;
@@ -209,7 +236,7 @@ FloatOp Ops::easeInOut() const { return easeInOut(FloatOp()); }
 
 FloatOp Ops::easeInOut(const float e) const { return easeInOut(c(e)); }
 
-FloatOp Ops::easeOutIn(const FloatOp &e) const {
+FloatOp Ops::easeOutIn(const FloatOp e) const {
   return [e](const float pos) {
     float value = pos * 2.f;
     float eValue = 3.f;
@@ -252,7 +279,7 @@ FloatOp Ops::env(const float attackLength, const float attackLevel,
   };
 }
 
-FloatOp Ops::breakpoints(const vector<vector<float>> &points) const {
+FloatOp Ops::breakpoints(const vector<vector<float>> points) const {
   return [points](const float pos) {
     for (int i = 0; i < points.size(); ++i) {
       if (pos < points[i][0]) {
@@ -270,7 +297,7 @@ FloatOp Ops::breakpoints(const vector<vector<float>> &points) const {
   };
 }
 
-FloatOp Ops::gaussian(const FloatOp &lo, const FloatOp &hi) const {
+FloatOp Ops::gaussian(const FloatOp lo, const FloatOp hi) const {
   return [lo, hi](const float pos) {
     float g = ofRandomGaussian(0.f, 1.f);
     if (g < -1.f)
@@ -284,8 +311,8 @@ FloatOp Ops::gaussian(const FloatOp &lo, const FloatOp &hi) const {
   };
 }
 
-FloatOp Ops::random(const FloatOp &lo, const FloatOp &hi,
-                    const FloatOp &mode) const {
+FloatOp Ops::random(const FloatOp lo, const FloatOp hi,
+                    const FloatOp mode) const {
   return [lo, hi, mode, this](const float pos) {
     const float loVal = lo ? lo(pos) : 0.f;
     const float hiVal = hi ? hi(pos) : 1.f;
@@ -299,21 +326,21 @@ FloatOp Ops::random(const FloatOp &lo, const FloatOp &hi,
   };
 }
 
-FloatOp Ops::lookup(const std::vector<float> &table) const {
+FloatOp Ops::lookup(const std::vector<float> table) const {
   return [table](const float pos) {
     const int t = static_cast<int>(ofMap(pos, 0.f, 1.f, 0.f, table.size()));
     return table[t];
   };
 }
 
-FloatOp Ops::lookup(const std::vector<FloatOp> &table) const {
+FloatOp Ops::lookup(const std::vector<FloatOp> table) const {
   return [table](const float pos) {
     const int t = static_cast<int>(ofMap(pos, 0.f, 1.f, 0.f, table.size()));
     return table[t](pos);
   };
 }
 
-FloatOp Ops::wt(const std::vector<float> &wTable) const {
+FloatOp Ops::wt(const std::vector<float> wTable) const {
   return [wTable](const float pos) {
     // Map pos to the range of the wavetable indices
     float exactPos = ofMap(pos, 0.f, 1.f, 0.f, wTable.size());
@@ -329,7 +356,7 @@ FloatOp Ops::wt(const std::vector<float> &wTable) const {
   };
 }
 
-FloatOp Ops::wt(const std::vector<FloatOp> &wTable) const {
+FloatOp Ops::wt(const std::vector<FloatOp> wTable) const {
   return [wTable](const float pos) {
     // Map pos to the range of the wavetable indices
     float exactPos = ofMap(pos, 0.f, 1.f, 0.f, wTable.size());
@@ -345,7 +372,7 @@ FloatOp Ops::wt(const std::vector<FloatOp> &wTable) const {
   };
 }
 
-FloatOp Ops::wt(const std::vector<float> &wTable, const FloatOp &xOp) const {
+FloatOp Ops::wt(const std::vector<float> wTable, const FloatOp xOp) const {
   return [wTable, xOp](float pos) {
     // Map xOp to the range of the wavetable
     float xPos = ofMap(xOp(pos), 0.f, 1.f, 0.f, wTable.size() - 1);
@@ -364,7 +391,7 @@ FloatOp Ops::wt(const std::vector<float> &wTable, const FloatOp &xOp) const {
   };
 }
 
-FloatOp Ops::wt(const std::vector<FloatOp> &wTable, const FloatOp &xOp) const {
+FloatOp Ops::wt(const std::vector<FloatOp> wTable, const FloatOp xOp) const {
   return [wTable, xOp](float pos) {
     // Map xOp to the range of the wavetable
     float xPos = ofMap(xOp(pos), 0.f, 1.f, 0.f, wTable.size() - 1);
@@ -383,8 +410,8 @@ FloatOp Ops::wt(const std::vector<FloatOp> &wTable, const FloatOp &xOp) const {
   };
 }
 
-FloatOp Ops::wt2d(const std::vector<std::vector<float>> &wTable,
-                  const FloatOp &xOp, const FloatOp &yOp) const {
+FloatOp Ops::wt2d(const std::vector<std::vector<float>> wTable,
+                  const FloatOp xOp, const FloatOp yOp) const {
   return [wTable, xOp, yOp](float pos) {
     // Map xOp and yOp to their respective ranges
     float xPos = ofMap(xOp(pos), 0.f, 1.f, 0.f, wTable.size() - 1);
@@ -415,8 +442,8 @@ FloatOp Ops::wt2d(const std::vector<std::vector<float>> &wTable,
   };
 }
 
-FloatOp Ops::wt2d(const std::vector<std::vector<FloatOp>> &wTable,
-                  const FloatOp &xOp, const FloatOp &yOp) const {
+FloatOp Ops::wt2d(const std::vector<std::vector<FloatOp>> wTable,
+                  const FloatOp xOp, const FloatOp yOp) const {
   return [wTable, xOp, yOp](float pos) {
     // Map xOp and yOp to their respective ranges
     float xPos = ofMap(xOp(pos), 0.f, 1.f, 0.f, wTable.size() - 1);
@@ -447,9 +474,9 @@ FloatOp Ops::wt2d(const std::vector<std::vector<FloatOp>> &wTable,
   };
 }
 
-FloatOp Ops::wt3d(const std::vector<std::vector<std::vector<float>>> &wTable,
-                  const FloatOp &xOp, const FloatOp &yOp,
-                  const FloatOp &zOp) const {
+FloatOp Ops::wt3d(const std::vector<std::vector<std::vector<float>>> wTable,
+                  const FloatOp xOp, const FloatOp yOp,
+                  const FloatOp zOp) const {
   return [wTable, xOp, yOp, zOp](float pos) {
     // Get exact positions for each axis
     float xPos = ofMap(xOp(pos), 0.f, 1.f, 0.f, wTable.size() - 1);
@@ -493,9 +520,9 @@ FloatOp Ops::wt3d(const std::vector<std::vector<std::vector<float>>> &wTable,
   };
 }
 
-FloatOp
-Ops::wt3d(const std::vector<std::vector<std::vector<FloatOp>>> &wOpTable,
-          const FloatOp &xOp, const FloatOp &yOp, const FloatOp &zOp) const {
+FloatOp Ops::wt3d(const std::vector<std::vector<std::vector<FloatOp>>> wOpTable,
+                  const FloatOp xOp, const FloatOp yOp,
+                  const FloatOp zOp) const {
   return [wOpTable, xOp, yOp, zOp](float pos) {
     // Get exact positions for each axis
     float xPos = ofMap(xOp(pos), 0.f, 1.f, 0.f, wOpTable.size() - 1);
@@ -540,8 +567,8 @@ Ops::wt3d(const std::vector<std::vector<std::vector<FloatOp>>> &wOpTable,
   };
 }
 
-FloatOp Ops::perlin(const FloatOp &x, const FloatOp &y, const FloatOp &z,
-                    const FloatOp &falloff, const FloatOp &octaves) const {
+FloatOp Ops::perlin(const FloatOp x, const FloatOp y, const FloatOp z,
+                    const FloatOp falloff, const FloatOp octaves) const {
   return [x, y, z, falloff, octaves, this](const float pos) {
     int lod = 1;
     float fof = 1.f;
@@ -570,19 +597,19 @@ FloatOp Ops::fuzz(const float fuzzScale) const {
   };
 }
 
-FloatOp Ops::mult(const FloatOp &op, const float scalar) const {
+FloatOp Ops::mult(const FloatOp op, const float scalar) const {
   return [op, scalar](const float pos) { return op(pos) * scalar; };
 }
 
-FloatOp Ops::bias(const FloatOp &op, const float offset) const {
+FloatOp Ops::bias(const FloatOp op, const float offset) const {
   return [op, offset](const float pos) { return op(pos) + offset; };
 }
 
-FloatOp Ops::bias(const FloatOp &op, const FloatOp &offset) const {
+FloatOp Ops::bias(const FloatOp op, const FloatOp offset) const {
   return [op, offset](const float pos) { return op(pos) + offset(pos); };
 }
 
-FloatOp Ops::phase(const FloatOp &op, const float phaseOffset) const {
+FloatOp Ops::phase(const FloatOp op, const float phaseOffset) const {
   return [op, phaseOffset](const float pos) {
     float modPos = pos + phaseOffset;
     if (modPos > 1.f) {
@@ -592,7 +619,7 @@ FloatOp Ops::phase(const FloatOp &op, const float phaseOffset) const {
   };
 }
 
-FloatOp Ops::phase(const FloatOp &op, const FloatOp &phaseOffset) const {
+FloatOp Ops::phase(const FloatOp op, const FloatOp phaseOffset) const {
   return [op, phaseOffset](const float pos) {
     float modPos = pos + phaseOffset(pos);
     if (modPos > 1.f)
@@ -601,7 +628,7 @@ FloatOp Ops::phase(const FloatOp &op, const FloatOp &phaseOffset) const {
   };
 }
 
-FloatOp Ops::rate(const FloatOp &op, float rateOffset) const {
+FloatOp Ops::rate(const FloatOp op, float rateOffset) const {
   return [op, rateOffset, lastPos = 0.f,
           accumulatedPos = 0.f](const float pos) mutable {
     float deltaPos = pos - lastPos;
@@ -612,12 +639,11 @@ FloatOp Ops::rate(const FloatOp &op, float rateOffset) const {
     accumulatedPos += modDelta;
     if (accumulatedPos > 1.f)
       accumulatedPos = fmod(accumulatedPos, 1.f);
-    float v = op(accumulatedPos);
     return op(accumulatedPos);
   };
 }
 
-FloatOp Ops::rate(const FloatOp &op, const FloatOp &rateOffset) const {
+FloatOp Ops::rate(const FloatOp op, const FloatOp rateOffset) const {
   return [op, rateOffset, lastPos = 0.f,
           accumulatedPos = 0.f](const float pos) mutable {
     float deltaPos = pos - lastPos;
@@ -628,12 +654,11 @@ FloatOp Ops::rate(const FloatOp &op, const FloatOp &rateOffset) const {
     accumulatedPos += modDelta;
     if (accumulatedPos > 1.f)
       accumulatedPos = fmod(accumulatedPos, 1.f);
-    float v = op(accumulatedPos);
     return op(accumulatedPos);
   };
 }
 
-FloatOp Ops::ring(const FloatOp &opA, const FloatOp &opB) const {
+FloatOp Ops::ring(const FloatOp opA, const FloatOp opB) const {
   return [opA, opB](const float pos) {
     const float a = opA(pos);
     const float b = opB(pos);
@@ -641,7 +666,7 @@ FloatOp Ops::ring(const FloatOp &opA, const FloatOp &opB) const {
   };
 }
 
-FloatOp Ops::wrap(const FloatOp &op, float min, float max) const {
+FloatOp Ops::wrap(const FloatOp op, float min, float max) const {
   return [op, min, max](const float pos) {
     const float val = op(pos);
     if (val < min)
@@ -652,8 +677,8 @@ FloatOp Ops::wrap(const FloatOp &op, float min, float max) const {
   };
 }
 
-FloatOp Ops::wrap(const FloatOp &op, const FloatOp &minOp,
-                  const FloatOp &maxOp) const {
+FloatOp Ops::wrap(const FloatOp op, const FloatOp minOp,
+                  const FloatOp maxOp) const {
   return [op, minOp, maxOp](const float pos) {
     const float val = op(pos);
     const float minVal = minOp(pos);
@@ -666,7 +691,7 @@ FloatOp Ops::wrap(const FloatOp &op, const FloatOp &minOp,
   };
 }
 
-FloatOp Ops::fold(const FloatOp &op, const FloatOp &threshold) const {
+FloatOp Ops::fold(const FloatOp op, const FloatOp threshold) const {
   return [op, threshold](const float pos) {
     float val = op(pos);
     const float thresh = threshold(pos);
@@ -677,7 +702,7 @@ FloatOp Ops::fold(const FloatOp &op, const FloatOp &threshold) const {
   };
 }
 
-FloatOp Ops::fold(const FloatOp &op, const float threshold) const {
+FloatOp Ops::fold(const FloatOp op, const float threshold) const {
   return [op, threshold](const float pos) {
     float val = op(pos);
     while (val > threshold) {
@@ -687,7 +712,7 @@ FloatOp Ops::fold(const FloatOp &op, const float threshold) const {
   };
 }
 
-FloatOp Ops::fold(const FloatOp &op) const {
+FloatOp Ops::fold(const FloatOp op) const {
   return [op](const float pos) {
     float val = op(pos);
     while (val > 1.f) {
@@ -697,7 +722,7 @@ FloatOp Ops::fold(const FloatOp &op) const {
   };
 }
 
-FloatOp Ops::lpf(const FloatOp &inputOp, const int windowSize) const {
+FloatOp Ops::lpf(const FloatOp inputOp, const int windowSize) const {
   return [inputOp, windowSize](const float pos) {
     float sum = 0.f;
     for (int i = 0; i < windowSize; ++i) {
@@ -727,7 +752,7 @@ FloatOp Ops::lpFb(float smoothing, float resonance) const {
 }
 
 FloatOp Ops::ampFb(float feedbackStrength, float damping,
-                   const FloatOp &inputOp) const {
+                   const FloatOp inputOp) const {
   return [inputOp, feedbackStrength, damping,
           lastOutput = 0.0f](const float pos) mutable -> float {
     // Get the current input value
@@ -746,8 +771,8 @@ FloatOp Ops::ampFb(float feedbackStrength, float damping,
   };
 }
 
-FloatOp Ops::morph(const FloatOp &opA, const FloatOp &opB,
-                   const FloatOp &morphParam) const {
+FloatOp Ops::morph(const FloatOp opA, const FloatOp opB,
+                   const FloatOp morphParam) const {
   return [opA, opB, morphParam](const float pos) -> float {
     float blend = morphParam(pos);
     blend = std::clamp(blend, 0.0f, 1.0f); // Ensure blend stays within [0, 1]
@@ -755,8 +780,7 @@ FloatOp Ops::morph(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::morph(const vector<FloatOp> &ops,
-                   const FloatOp &morphParam) const {
+FloatOp Ops::morph(const vector<FloatOp> ops, const FloatOp morphParam) const {
   return [ops, morphParam](const float pos) -> float {
     float blend = morphParam(pos);
     blend = std::clamp(blend, 0.0f, 1.0f); // Ensure blend stays within [0, 1]
@@ -775,7 +799,7 @@ FloatOp Ops::morph(const vector<FloatOp> &ops,
   };
 }
 
-FloatOp Ops::mix(const vector<FloatOp> &ops) const {
+FloatOp Ops::mix(const vector<FloatOp> ops) const {
   return [ops](const float pos) {
     float sum = 0.f;
     for (const auto &op : ops) {
@@ -785,8 +809,7 @@ FloatOp Ops::mix(const vector<FloatOp> &ops) const {
   };
 }
 
-FloatOp Ops::mix(const vector<FloatOp> &ops,
-                 const vector<float> &levels) const {
+FloatOp Ops::mix(const vector<FloatOp> ops, const vector<float> levels) const {
   return [ops, levels](const float pos) {
     float sum = 0.f;
     for (int i = 0; i < ops.size(); ++i) {
@@ -796,8 +819,8 @@ FloatOp Ops::mix(const vector<FloatOp> &ops,
   };
 }
 
-FloatOp Ops::mix(const vector<FloatOp> &ops,
-                 const vector<FloatOp> &levels) const {
+FloatOp Ops::mix(const vector<FloatOp> ops,
+                 const vector<FloatOp> levels) const {
   return [ops, levels](const float pos) {
     float sum = 0.f;
     for (int i = 0; i < ops.size(); ++i) {
@@ -807,7 +830,7 @@ FloatOp Ops::mix(const vector<FloatOp> &ops,
   };
 }
 
-FloatOp Ops::sum(const vector<FloatOp> &ops) const {
+FloatOp Ops::sum(const vector<FloatOp> ops) const {
   return [ops](const float pos) {
     float sum = 0.f;
     for (const auto &op : ops) {
@@ -817,7 +840,7 @@ FloatOp Ops::sum(const vector<FloatOp> &ops) const {
   };
 }
 
-FloatOp Ops::product(const vector<FloatOp> &ops) const {
+FloatOp Ops::product(const vector<FloatOp> ops) const {
   return [ops](const float pos) {
     float product = 1.f;
     for (const auto &op : ops) {
@@ -827,7 +850,7 @@ FloatOp Ops::product(const vector<FloatOp> &ops) const {
   };
 }
 
-FloatOp Ops::min(const vector<FloatOp> &ops) const {
+FloatOp Ops::min(const vector<FloatOp> ops) const {
   return [ops](const float pos) {
     float min = std::numeric_limits<float>::max();
     for (const auto &op : ops) {
@@ -838,7 +861,7 @@ FloatOp Ops::min(const vector<FloatOp> &ops) const {
   };
 }
 
-FloatOp Ops::max(const vector<FloatOp> &ops) const {
+FloatOp Ops::max(const vector<FloatOp> ops) const {
   return [ops](const float pos) {
     float max = std::numeric_limits<float>::min();
     for (const auto &op : ops) {
@@ -849,9 +872,9 @@ FloatOp Ops::max(const vector<FloatOp> &ops) const {
   };
 }
 
-FloatOp Ops::mean(const vector<FloatOp> &ops) const { return mix(ops); }
+FloatOp Ops::mean(const vector<FloatOp> ops) const { return mix(ops); }
 
-FloatOp Ops::median(const vector<FloatOp> &ops) const {
+FloatOp Ops::median(const vector<FloatOp> ops) const {
   return [ops](const float pos) {
     vector<float> values;
     values.reserve(ops.size());
@@ -864,7 +887,7 @@ FloatOp Ops::median(const vector<FloatOp> &ops) const {
   };
 }
 
-FloatOp Ops::variance(const vector<FloatOp> &ops) const {
+FloatOp Ops::variance(const vector<FloatOp> ops) const {
   return [ops, this](const float pos) {
     const float mn = mean(ops)(pos);
     float variance = 0.f;
@@ -877,7 +900,7 @@ FloatOp Ops::variance(const vector<FloatOp> &ops) const {
   };
 }
 
-FloatOp Ops::stdDev(const vector<FloatOp> &ops) const {
+FloatOp Ops::stdDev(const vector<FloatOp> ops) const {
   return [ops, this](const float pos) { return std::sqrt(variance(ops)(pos)); };
 }
 
@@ -906,7 +929,7 @@ FloatOp Ops::ema(float smoothingFactor) const {
       };
 }
 
-FloatOp Ops::ema(const FloatOp &smoothingFactor) const {
+FloatOp Ops::ema(const FloatOp smoothingFactor) const {
   return
       [smoothingFactor, lastOutput = 0.0f](const float pos) mutable -> float {
         const float smoothing = smoothingFactor(pos);
@@ -915,15 +938,15 @@ FloatOp Ops::ema(const FloatOp &smoothingFactor) const {
       };
 }
 
-FloatOp Ops::abs(const FloatOp &op) const {
+FloatOp Ops::abs(const FloatOp op) const {
   return [op](const float pos) { return std::abs(op(pos)); };
 }
 
-FloatOp Ops::diff(const FloatOp &opA, const FloatOp &opB) const {
+FloatOp Ops::diff(const FloatOp opA, const FloatOp opB) const {
   return [opA, opB](const float pos) { return opA(pos) - opB(pos); };
 }
 
-FloatOp Ops::crossed(const FloatOp &opA, const FloatOp &opB) const {
+FloatOp Ops::crossed(const FloatOp opA, const FloatOp opB) const {
   return [opA, opB,
           lastComparison = std::optional<bool>()](const float pos) mutable {
     const float a = opA(pos);
@@ -946,7 +969,7 @@ FloatOp Ops::crossed(const FloatOp &opA, const FloatOp &opB) const {
   };
 }
 
-FloatOp Ops::trendFlip(const FloatOp &inputOp) const {
+FloatOp Ops::trendFlip(const FloatOp inputOp) const {
   return [inputOp, lastValue = std::optional<float>(),
           lastDirection =
               std::optional<bool>()](const float pos) mutable -> float {
@@ -983,51 +1006,51 @@ FloatOp Ops::trendFlip(const FloatOp &inputOp) const {
   };
 }
 
-FloatOp Ops::greater(const FloatOp &opA, const FloatOp &opB) const {
+FloatOp Ops::greater(const FloatOp opA, const FloatOp opB) const {
   return
       [opA, opB](const float pos) { return opA(pos) > opB(pos) ? 1.f : 0.f; };
 }
 
-FloatOp Ops::greater(const FloatOp &opA, const float threshold) const {
+FloatOp Ops::greater(const FloatOp opA, const float threshold) const {
   return [opA, threshold](const float pos) {
     return opA(pos) > threshold ? 1.f : 0.f;
   };
 }
 
-FloatOp Ops::less(const FloatOp &opA, const FloatOp &opB) const {
+FloatOp Ops::less(const FloatOp opA, const FloatOp opB) const {
   return
       [opA, opB](const float pos) { return opA(pos) < opB(pos) ? 1.f : 0.f; };
 }
 
-FloatOp Ops::less(const FloatOp &opA, const float threshold) const {
+FloatOp Ops::less(const FloatOp opA, const float threshold) const {
   return [opA, threshold](const float pos) {
     return opA(pos) < threshold ? 1.f : 0.f;
   };
 }
 
-FloatOp Ops::equal(const FloatOp &opA, const FloatOp &opB) const {
+FloatOp Ops::equal(const FloatOp opA, const FloatOp opB) const {
   return
       [opA, opB](const float pos) { return opA(pos) == opB(pos) ? 1.f : 0.f; };
 }
 
-FloatOp Ops::equal(const FloatOp &opA, const float threshold) const {
+FloatOp Ops::equal(const FloatOp opA, const float threshold) const {
   return [opA, threshold](const float pos) {
     return opA(pos) == threshold ? 1.f : 0.f;
   };
 }
 
-FloatOp Ops::notEqual(const FloatOp &opA, const FloatOp &opB) const {
+FloatOp Ops::notEqual(const FloatOp opA, const FloatOp opB) const {
   return
       [opA, opB](const float pos) { return opA(pos) != opB(pos) ? 1.f : 0.f; };
 }
 
-FloatOp Ops::notEqual(const FloatOp &opA, const float threshold) const {
+FloatOp Ops::notEqual(const FloatOp opA, const float threshold) const {
   return [opA, threshold](const float pos) {
     return opA(pos) != threshold ? 1.f : 0.f;
   };
 }
 
-FloatOp Ops::and_(const FloatOp &opA, const FloatOp &opB,
+FloatOp Ops::and_(const FloatOp opA, const FloatOp opB,
                   const float threshold) const {
   return [opA, opB, threshold](const float pos) {
     const float a = opA(pos);
@@ -1036,8 +1059,8 @@ FloatOp Ops::and_(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::and_(const FloatOp &opA, const FloatOp &opB,
-                  const FloatOp &threshold) const {
+FloatOp Ops::and_(const FloatOp opA, const FloatOp opB,
+                  const FloatOp threshold) const {
   return [opA, opB, threshold](const float pos) {
     const float a = opA(pos);
     const float b = opB(pos);
@@ -1046,7 +1069,7 @@ FloatOp Ops::and_(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::or_(const FloatOp &opA, const FloatOp &opB,
+FloatOp Ops::or_(const FloatOp opA, const FloatOp opB,
                  const float threshold) const {
   return [opA, opB, threshold](const float pos) {
     const float a = opA(pos);
@@ -1055,8 +1078,8 @@ FloatOp Ops::or_(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::or_(const FloatOp &opA, const FloatOp &opB,
-                 const FloatOp &threshold) const {
+FloatOp Ops::or_(const FloatOp opA, const FloatOp opB,
+                 const FloatOp threshold) const {
   return [opA, opB, threshold](const float pos) {
     const float a = opA(pos);
     const float b = opB(pos);
@@ -1065,11 +1088,11 @@ FloatOp Ops::or_(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::not_(const FloatOp &op) const {
+FloatOp Ops::not_(const FloatOp op) const {
   return [op](const float pos) { return op(pos) == 0.f ? 1.f : 0.f; };
 }
 
-FloatOp Ops::xor_(const FloatOp &opA, const FloatOp &opB,
+FloatOp Ops::xor_(const FloatOp opA, const FloatOp opB,
                   const float threshold) const {
   return [opA, opB, threshold](const float pos) {
     const float a = opA(pos);
@@ -1081,8 +1104,8 @@ FloatOp Ops::xor_(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::xor_(const FloatOp &opA, const FloatOp &opB,
-                  const FloatOp &threshold) const {
+FloatOp Ops::xor_(const FloatOp opA, const FloatOp opB,
+                  const FloatOp threshold) const {
   return [opA, opB, threshold](const float pos) {
     const float a = opA(pos);
     const float b = opB(pos);
@@ -1091,7 +1114,7 @@ FloatOp Ops::xor_(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::nand(const FloatOp &opA, const FloatOp &opB,
+FloatOp Ops::nand(const FloatOp opA, const FloatOp opB,
                   const float threshold) const {
   return [opA, opB, threshold](const float pos) {
     const float a = opA(pos);
@@ -1100,8 +1123,8 @@ FloatOp Ops::nand(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::nand(const FloatOp &opA, const FloatOp &opB,
-                  const FloatOp &threshold) const {
+FloatOp Ops::nand(const FloatOp opA, const FloatOp opB,
+                  const FloatOp threshold) const {
   return [opA, opB, threshold](const float pos) {
     const float a = opA(pos);
     const float b = opB(pos);
@@ -1110,7 +1133,7 @@ FloatOp Ops::nand(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::nor(const FloatOp &opA, const FloatOp &opB,
+FloatOp Ops::nor(const FloatOp opA, const FloatOp opB,
                  const float threshold) const {
   return [opA, opB, threshold](const float pos) {
     const float a = opA(pos);
@@ -1119,8 +1142,8 @@ FloatOp Ops::nor(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::nor(const FloatOp &opA, const FloatOp &opB,
-                 const FloatOp &threshold) const {
+FloatOp Ops::nor(const FloatOp opA, const FloatOp opB,
+                 const FloatOp threshold) const {
   return [opA, opB, threshold](const float pos) {
     const float a = opA(pos);
     const float b = opB(pos);
@@ -1129,7 +1152,7 @@ FloatOp Ops::nor(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::xnor(const FloatOp &opA, const FloatOp &opB,
+FloatOp Ops::xnor(const FloatOp opA, const FloatOp opB,
                   const float threshold) const {
   return [opA, opB, threshold](const float pos) {
     const float a = opA(pos);
@@ -1141,8 +1164,8 @@ FloatOp Ops::xnor(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::xnor(const FloatOp &opA, const FloatOp &opB,
-                  const FloatOp &threshold) const {
+FloatOp Ops::xnor(const FloatOp opA, const FloatOp opB,
+                  const FloatOp threshold) const {
   return [opA, opB, threshold](const float pos) {
     const float a = opA(pos);
     const float b = opB(pos);
@@ -1151,64 +1174,63 @@ FloatOp Ops::xnor(const FloatOp &opA, const FloatOp &opB,
   };
 }
 
-FloatOp Ops::in(const FloatOp &op, const float lo, const float hi) const {
+FloatOp Ops::in(const FloatOp op, const float lo, const float hi) const {
   return [op, lo, hi](const float pos) {
     const float val = op(pos);
     return val >= lo && val <= hi ? 1.f : 0.f;
   };
 }
 
-FloatOp Ops::in(const FloatOp &op, const FloatOp &lo, const FloatOp &hi) const {
+FloatOp Ops::in(const FloatOp op, const FloatOp lo, const FloatOp hi) const {
   return [op, lo, hi](const float pos) {
     const float val = op(pos);
     return val >= lo(pos) && val <= hi(pos) ? 1.f : 0.f;
   };
 }
 
-FloatOp Ops::in(const FloatOp &op, const float lo, const FloatOp &hi) const {
+FloatOp Ops::in(const FloatOp op, const float lo, const FloatOp hi) const {
   return [op, lo, hi](const float pos) {
     const float val = op(pos);
     return val >= lo && val <= hi(pos) ? 1.f : 0.f;
   };
 }
 
-FloatOp Ops::in(const FloatOp &op, const FloatOp &lo, const float hi) const {
+FloatOp Ops::in(const FloatOp op, const FloatOp lo, const float hi) const {
   return [op, lo, hi](const float pos) {
     const float val = op(pos);
     return val >= lo(pos) && val <= hi ? 1.f : 0.f;
   };
 }
 
-FloatOp Ops::out(const FloatOp &op, const float lo, const float hi) const {
+FloatOp Ops::out(const FloatOp op, const float lo, const float hi) const {
   return [op, lo, hi](const float pos) {
     const float val = op(pos);
     return val < lo || val > hi ? 1.f : 0.f;
   };
 }
 
-FloatOp Ops::out(const FloatOp &op, const FloatOp &lo,
-                 const FloatOp &hi) const {
+FloatOp Ops::out(const FloatOp op, const FloatOp lo, const FloatOp hi) const {
   return [op, lo, hi](const float pos) {
     const float val = op(pos);
     return val < lo(pos) || val > hi(pos) ? 1.f : 0.f;
   };
 }
 
-FloatOp Ops::out(const FloatOp &op, const float lo, const FloatOp &hi) const {
+FloatOp Ops::out(const FloatOp op, const float lo, const FloatOp hi) const {
   return [op, lo, hi](const float pos) {
     const float val = op(pos);
     return val < lo || val > hi(pos) ? 1.f : 0.f;
   };
 }
 
-FloatOp Ops::out(const FloatOp &op, const FloatOp &lo, const float hi) const {
+FloatOp Ops::out(const FloatOp op, const FloatOp lo, const float hi) const {
   return [op, lo, hi](const float pos) {
     const float val = op(pos);
     return val < lo(pos) || val > hi ? 1.f : 0.f;
   };
 }
 
-FloatOp Ops::chain(const vector<FloatOp> &ops) const {
+FloatOp Ops::chain(const vector<FloatOp> ops) const {
   return [ops](const float pos) {
     float val = pos;
     for (const auto &op : ops) {
@@ -1218,14 +1240,14 @@ FloatOp Ops::chain(const vector<FloatOp> &ops) const {
   };
 }
 
-FloatOp Ops::choose(const vector<FloatOp> &ops) const {
+FloatOp Ops::choose(const vector<FloatOp> ops) const {
   return [ops](const float pos) {
     const int index = static_cast<int>(ofRandom(ops.size()));
     return ops[index](pos);
   };
 }
 
-vector<float> Ops::normalize(const vector<float> &values) const {
+vector<float> Ops::normalize(const vector<float> values) const {
   // Find min and max using structured bindings
   const auto [minIt, maxIt] = std::minmax_element(values.begin(), values.end());
   const float min = *minIt;
@@ -1241,7 +1263,7 @@ vector<float> Ops::normalize(const vector<float> &values) const {
   return normValues;
 }
 
-FloatOp Ops::timeseries(const vector<float> &yValues) const {
+FloatOp Ops::timeseries(const vector<float> yValues) const {
   vector<float> normValues = normalize(yValues);
   return [normValues](const float pos) {
     const int index = static_cast<int>(pos * (normValues.size() - 1));
@@ -1251,8 +1273,8 @@ FloatOp Ops::timeseries(const vector<float> &yValues) const {
   };
 }
 
-vector<float> Ops::floatArray(const FloatOp &op, const int numSamples,
-                              const FloatOp &mapOp) const {
+vector<float> Ops::floatArray(const FloatOp op, const int numSamples,
+                              const FloatOp mapOp) const {
   const float step = 1.f / numSamples;
   vector<float> localTable(numSamples);
   for (int i = 0; i < numSamples; ++i) {
@@ -1268,7 +1290,7 @@ vector<float> Ops::floatArray(const FloatOp &op, const int numSamples,
   return mappedTable;
 }
 
-vector<glm::vec2> Ops::glv2Array(const FloatOp &curve, const float start,
+vector<glm::vec2> Ops::glv2Array(const FloatOp curve, const float start,
                                  const float end, const int numPoints,
                                  const float yScale) const {
   vector<glm::vec2> points(numPoints);
@@ -1282,7 +1304,7 @@ vector<glm::vec2> Ops::glv2Array(const FloatOp &curve, const float start,
   return points;
 }
 
-vector<glm::vec3> Ops::glv3Array(const FloatOp &curve, const float start,
+vector<glm::vec3> Ops::glv3Array(const FloatOp curve, const float start,
                                  const float end, const int numPoints,
                                  const float yScale) const {
   vector<glm::vec3> points(numPoints);
@@ -1296,7 +1318,7 @@ vector<glm::vec3> Ops::glv3Array(const FloatOp &curve, const float start,
   return points;
 }
 
-vector<ofVec2f> Ops::ofv2Array(const FloatOp &curve, const float start,
+vector<ofVec2f> Ops::ofv2Array(const FloatOp curve, const float start,
                                const float end, const int numPoints,
                                const float yScale) const {
   vector<ofVec2f> points(numPoints);
@@ -1310,7 +1332,7 @@ vector<ofVec2f> Ops::ofv2Array(const FloatOp &curve, const float start,
   return points;
 }
 
-vector<ofVec3f> Ops::ofv3Array(const FloatOp &curve, const float start,
+vector<ofVec3f> Ops::ofv3Array(const FloatOp curve, const float start,
                                const float end, const int numPoints,
                                const float yScale) const {
   vector<ofVec3f> points(numPoints);
@@ -1386,7 +1408,7 @@ float Ops::pNoise(const float x, const float falloff, const int octaves) const {
   return total / maxAmplitude;
 }
 
-void Ops::plot(const FloatOp &op, const float yScale, const ofColor color,
+void Ops::plot(const FloatOp op, const float yScale, const ofColor color,
                const bool fill) const {
   ofPushStyle();
   ofSetColor(color);

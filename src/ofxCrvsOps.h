@@ -65,58 +65,61 @@ public:
     return [](const float) { return static_cast<float>(ofGetMouseY()); };
   };
 
-  [[nodiscard]] FloatOp bipolarize(const FloatOp &unipolarOp) const;
-  [[nodiscard]] FloatOp rectify(const FloatOp &bipolarOp) const;
+  [[nodiscard]] FloatOp bipolarize(const FloatOp unipolarOp) const;
+  [[nodiscard]] FloatOp rectify(const FloatOp bipolarOp) const;
   [[nodiscard]] FloatOp c(float value) const;
-  [[nodiscard]] FloatOp framePhasor(float cyclesPerSecond) const;
+  [[nodiscard]] inline FloatOp
+  timePhasor(double cycleDurationSeconds = 2.0) const;
+  [[nodiscard]] inline FloatOp tempoPhasor(double barsPerCycle = 1.0,
+                                           double bpm = 120.0) const;
   [[nodiscard]] FloatOp phasor() const;
   [[nodiscard]] FloatOp saw() const;
-  [[nodiscard]] FloatOp tri(const FloatOp &s) const;
+  [[nodiscard]] FloatOp tri(const FloatOp s) const;
   [[nodiscard]] FloatOp tri() const;
   [[nodiscard]] FloatOp tri(float s) const;
-  [[nodiscard]] FloatOp sine(const FloatOp &fb) const;
+  [[nodiscard]] FloatOp sine(const FloatOp fb) const;
   [[nodiscard]] FloatOp sine() const;
   [[nodiscard]] FloatOp sine(float fb) const;
-  [[nodiscard]] FloatOp sineFb(const FloatOp &fb) const;
+  [[nodiscard]] FloatOp sineFb(const FloatOp fb) const;
   [[nodiscard]] FloatOp sineFb(float fb = 0.f) const;
   [[nodiscard]] FloatOp asin() const;
-  [[nodiscard]] FloatOp cos(const FloatOp &fb) const;
+  [[nodiscard]] FloatOp cos(const FloatOp fb) const;
   [[nodiscard]] FloatOp cos(float fb) const;
   [[nodiscard]] FloatOp cos() const;
   [[nodiscard]] FloatOp acos() const;
-  [[nodiscard]] FloatOp tan(const FloatOp &fb) const;
+  [[nodiscard]] FloatOp tan(const FloatOp fb) const;
   [[nodiscard]] FloatOp tan(float fb) const;
   [[nodiscard]] FloatOp tan() const;
 
-  [[nodiscard]] FloatOp lookup(const std::vector<float> &table) const;
-  [[nodiscard]] FloatOp lookup(const std::vector<FloatOp> &table) const;
-  [[nodiscard]] FloatOp wt(const std::vector<float> &wTable) const;
-  [[nodiscard]] FloatOp wt(const std::vector<FloatOp> &wTable) const;
-  [[nodiscard]] FloatOp wt(const std::vector<float> &wTable,
-                           const FloatOp &xOp) const;
-  [[nodiscard]] FloatOp wt(const std::vector<FloatOp> &wTable,
-                           const FloatOp &xOp) const;
-  [[nodiscard]] FloatOp wt2d(const std::vector<std::vector<float>> &wTable,
-                             const FloatOp &xOp, const FloatOp &yOp) const;
-  [[nodiscard]] FloatOp wt2d(const std::vector<std::vector<FloatOp>> &wTable,
-                             const FloatOp &xOp, const FloatOp &yOp) const;
+  [[nodiscard]] FloatOp lookup(const std::vector<float> table) const;
+  [[nodiscard]] FloatOp lookup(const std::vector<FloatOp> table) const;
+  [[nodiscard]] FloatOp wt(const std::vector<float> wTable) const;
+  [[nodiscard]] FloatOp wt(const std::vector<FloatOp> wTable) const;
+  [[nodiscard]] FloatOp wt(const std::vector<float> wTable,
+                           const FloatOp xOp) const;
+  [[nodiscard]] FloatOp wt(const std::vector<FloatOp> wTable,
+                           const FloatOp xOp) const;
+  [[nodiscard]] FloatOp wt2d(const std::vector<std::vector<float>> wTable,
+                             const FloatOp xOp, const FloatOp yOp) const;
+  [[nodiscard]] FloatOp wt2d(const std::vector<std::vector<FloatOp>> wTable,
+                             const FloatOp xOp, const FloatOp yOp) const;
   [[nodiscard]] FloatOp
-  wt3d(const std::vector<std::vector<std::vector<float>>> &wTable,
-       const FloatOp &xOp, const FloatOp &yOp, const FloatOp &zOp) const;
+  wt3d(const std::vector<std::vector<std::vector<float>>> wTable,
+       const FloatOp xOp, const FloatOp yOp, const FloatOp zOp) const;
   [[nodiscard]] FloatOp
-  wt3d(const std::vector<std::vector<std::vector<FloatOp>>> &wOpTable,
-       const FloatOp &xOp, const FloatOp &yOp, const FloatOp &zOp) const;
+  wt3d(const std::vector<std::vector<std::vector<FloatOp>>> wOpTable,
+       const FloatOp xOp, const FloatOp yOp, const FloatOp zOp) const;
 
-  [[nodiscard]] FloatOp easeIn(const FloatOp &e) const;
+  [[nodiscard]] FloatOp easeIn(const FloatOp e) const;
   [[nodiscard]] FloatOp easeIn() const;
   [[nodiscard]] FloatOp easeIn(float e) const;
-  [[nodiscard]] FloatOp easeOut(const FloatOp &e) const;
+  [[nodiscard]] FloatOp easeOut(const FloatOp e) const;
   [[nodiscard]] FloatOp easeOut() const;
   [[nodiscard]] FloatOp easeOut(float e) const;
-  [[nodiscard]] FloatOp easeInOut(const FloatOp &e) const;
+  [[nodiscard]] FloatOp easeInOut(const FloatOp e) const;
   [[nodiscard]] FloatOp easeInOut() const;
   [[nodiscard]] FloatOp easeInOut(float e) const;
-  [[nodiscard]] FloatOp easeOutIn(const FloatOp &e) const;
+  [[nodiscard]] FloatOp easeOutIn(const FloatOp e) const;
   [[nodiscard]] FloatOp easeOutIn() const;
   [[nodiscard]] FloatOp easeOutIn(float e) const;
 
@@ -124,11 +127,11 @@ public:
   [[nodiscard]] FloatOp env(float attackLength, float attackLevel,
                             float decayLength, float sustainLength,
                             float sustainLevel, float releaseLength) const;
-  [[nodiscard]] FloatOp breakpoints(const vector<vector<float>> &points) const;
-  [[nodiscard]] FloatOp timeseries(const vector<float> &yValues) const;
+  [[nodiscard]] FloatOp breakpoints(const vector<vector<float>> points) const;
+  [[nodiscard]] FloatOp timeseries(const vector<float> yValues) const;
 
-  [[nodiscard]] FloatOp gaussian(const FloatOp &lo, const FloatOp &hi) const;
-  [[nodiscard]] FloatOp gaussian(const FloatOp &hi) const {
+  [[nodiscard]] FloatOp gaussian(const FloatOp lo, const FloatOp hi) const;
+  [[nodiscard]] FloatOp gaussian(const FloatOp hi) const {
     return gaussian(FloatOp(), hi);
   };
   [[nodiscard]] FloatOp guassian(float hi) const { return gaussian(c(hi)); };
@@ -136,142 +139,136 @@ public:
     return gaussian(FloatOp(), FloatOp());
   };
 
-  [[nodiscard]] FloatOp random(const FloatOp &lo, const FloatOp &hi,
-                               const FloatOp &mode) const;
+  [[nodiscard]] FloatOp random(const FloatOp lo, const FloatOp hi,
+                               const FloatOp mode) const;
   [[nodiscard]] FloatOp random() const {
     return random(FloatOp(), FloatOp(), FloatOp());
   };
-  [[nodiscard]] FloatOp random(const FloatOp &hi) const {
+  [[nodiscard]] FloatOp random(const FloatOp hi) const {
     return random(FloatOp(), hi, FloatOp());
   };
   [[nodiscard]] FloatOp random(float hi) const { return random(c(hi)); };
-  [[nodiscard]] FloatOp perlin(const FloatOp &x, const FloatOp &y = FloatOp(),
-                               const FloatOp &z = FloatOp(),
-                               const FloatOp &falloff = FloatOp(),
-                               const FloatOp &octaves = FloatOp()) const;
+  [[nodiscard]] FloatOp perlin(const FloatOp x, const FloatOp y = FloatOp(),
+                               const FloatOp z = FloatOp(),
+                               const FloatOp falloff = FloatOp(),
+                               const FloatOp octaves = FloatOp()) const;
   [[nodiscard]] FloatOp fuzz(const float fuzzScale) const;
 
   // Basic ops
-  [[nodiscard]] FloatOp abs(const FloatOp &op) const;
-  [[nodiscard]] FloatOp diff(const FloatOp &opA, const FloatOp &opB) const;
-  [[nodiscard]] FloatOp mult(const FloatOp &op, float scalar) const;
-  [[nodiscard]] FloatOp bias(const FloatOp &op, float offset) const;
-  [[nodiscard]] FloatOp bias(const FloatOp &op, const FloatOp &offset) const;
-  [[nodiscard]] FloatOp phase(const FloatOp &op, float phaseOffset) const;
-  [[nodiscard]] FloatOp phase(const FloatOp &op,
-                              const FloatOp &phaseOffset) const;
-  [[nodiscard]] FloatOp rate(const FloatOp &op, float rateOffset) const;
-  [[nodiscard]] FloatOp rate(const FloatOp &op,
-                             const FloatOp &rateOffset) const;
-  [[nodiscard]] FloatOp ring(const FloatOp &opA, const FloatOp &opB) const;
-  [[nodiscard]] FloatOp fold(const FloatOp &op, const FloatOp &threshold) const;
-  [[nodiscard]] FloatOp fold(const FloatOp &op, float threshold) const;
-  [[nodiscard]] FloatOp fold(const FloatOp &op) const;
-  [[nodiscard]] FloatOp wrap(const FloatOp &op, float min, float max) const;
-  [[nodiscard]] FloatOp wrap(const FloatOp &op, const FloatOp &minOp,
-                             const FloatOp &maxOp) const;
-  [[nodiscard]] FloatOp lpf(const FloatOp &inputOp, int windowSize) const;
+  [[nodiscard]] FloatOp abs(const FloatOp op) const;
+  [[nodiscard]] FloatOp diff(const FloatOp opA, const FloatOp opB) const;
+  [[nodiscard]] FloatOp mult(const FloatOp op, float scalar) const;
+  [[nodiscard]] FloatOp bias(const FloatOp op, float offset) const;
+  [[nodiscard]] FloatOp bias(const FloatOp op, const FloatOp offset) const;
+  [[nodiscard]] FloatOp phase(const FloatOp op, float phaseOffset) const;
+  [[nodiscard]] FloatOp phase(const FloatOp op,
+                              const FloatOp phaseOffset) const;
+  [[nodiscard]] FloatOp rate(const FloatOp op, float rateOffset) const;
+  [[nodiscard]] FloatOp rate(const FloatOp op, const FloatOp rateOffset) const;
+  [[nodiscard]] FloatOp ring(const FloatOp opA, const FloatOp opB) const;
+  [[nodiscard]] FloatOp fold(const FloatOp op, const FloatOp threshold) const;
+  [[nodiscard]] FloatOp fold(const FloatOp op, float threshold) const;
+  [[nodiscard]] FloatOp fold(const FloatOp op) const;
+  [[nodiscard]] FloatOp wrap(const FloatOp op, float min, float max) const;
+  [[nodiscard]] FloatOp wrap(const FloatOp op, const FloatOp minOp,
+                             const FloatOp maxOp) const;
+  [[nodiscard]] FloatOp lpf(const FloatOp inputOp, int windowSize) const;
   [[nodiscard]] FloatOp lpFb(float smoothing, float resonance) const;
   [[nodiscard]] FloatOp ampFb(float feedbackStrength, float damping,
-                              const FloatOp &inputOp = FloatOp()) const;
-  [[nodiscard]] FloatOp morph(const FloatOp &opA, const FloatOp &opB,
-                              const FloatOp &morphParam) const;
+                              const FloatOp inputOp = FloatOp()) const;
+  [[nodiscard]] FloatOp morph(const FloatOp opA, const FloatOp opB,
+                              const FloatOp morphParam) const;
 
   // Vector Ops - accept arrays of FloatOps
-  [[nodiscard]] FloatOp morph(const vector<FloatOp> &ops,
-                              const FloatOp &morphParam) const;
-  [[nodiscard]] FloatOp chain(const vector<FloatOp> &ops) const;
-  [[nodiscard]] FloatOp choose(const vector<FloatOp> &ops) const;
-  [[nodiscard]] FloatOp mix(const vector<FloatOp> &ops) const;
-  [[nodiscard]] FloatOp mix(const vector<FloatOp> &ops,
-                            const vector<float> &levels) const;
-  [[nodiscard]] FloatOp mix(const vector<FloatOp> &ops,
-                            const vector<FloatOp> &levels) const;
-  [[nodiscard]] FloatOp sum(const vector<FloatOp> &ops) const;
-  [[nodiscard]] FloatOp product(const vector<FloatOp> &ops) const;
-  [[nodiscard]] FloatOp min(const vector<FloatOp> &ops) const;
-  [[nodiscard]] FloatOp max(const vector<FloatOp> &ops) const;
-  [[nodiscard]] FloatOp mean(const vector<FloatOp> &ops) const;
-  [[nodiscard]] FloatOp median(const vector<FloatOp> &ops) const;
-  [[nodiscard]] FloatOp variance(const vector<FloatOp> &ops) const;
-  [[nodiscard]] FloatOp stdDev(const vector<FloatOp> &ops) const;
+  [[nodiscard]] FloatOp morph(const vector<FloatOp> ops,
+                              const FloatOp morphParam) const;
+  [[nodiscard]] FloatOp chain(const vector<FloatOp> ops) const;
+  [[nodiscard]] FloatOp choose(const vector<FloatOp> ops) const;
+  [[nodiscard]] FloatOp mix(const vector<FloatOp> ops) const;
+  [[nodiscard]] FloatOp mix(const vector<FloatOp> ops,
+                            const vector<float> levels) const;
+  [[nodiscard]] FloatOp mix(const vector<FloatOp> ops,
+                            const vector<FloatOp> levels) const;
+  [[nodiscard]] FloatOp sum(const vector<FloatOp> ops) const;
+  [[nodiscard]] FloatOp product(const vector<FloatOp> ops) const;
+  [[nodiscard]] FloatOp min(const vector<FloatOp> ops) const;
+  [[nodiscard]] FloatOp max(const vector<FloatOp> ops) const;
+  [[nodiscard]] FloatOp mean(const vector<FloatOp> ops) const;
+  [[nodiscard]] FloatOp median(const vector<FloatOp> ops) const;
+  [[nodiscard]] FloatOp variance(const vector<FloatOp> ops) const;
+  [[nodiscard]] FloatOp stdDev(const vector<FloatOp> ops) const;
 
   [[nodiscard]] FloatOp smooth() const;
   [[nodiscard]] FloatOp smoother() const;
   [[nodiscard]] FloatOp ema(float smoothingFactor) const;
-  [[nodiscard]] FloatOp ema(const FloatOp &smoothingFactor) const;
+  [[nodiscard]] FloatOp ema(const FloatOp smoothingFactor) const;
 
   // Digital Ops - return 0 or 1
-  [[nodiscard]] FloatOp pulse(const FloatOp &w = FloatOp()) const;
+  [[nodiscard]] FloatOp pulse(const FloatOp w = FloatOp()) const;
   [[nodiscard]] FloatOp pulse(float w) const;
   [[nodiscard]] FloatOp square() const;
-  [[nodiscard]] FloatOp crossed(const FloatOp &opA, const FloatOp &opB) const;
-  [[nodiscard]] FloatOp trendFlip(const FloatOp &inputOp) const;
-  [[nodiscard]] FloatOp greater(const FloatOp &opA, const FloatOp &opB) const;
-  [[nodiscard]] FloatOp greater(const FloatOp &opA, float threshold) const;
-  [[nodiscard]] FloatOp less(const FloatOp &opA, const FloatOp &opB) const;
-  [[nodiscard]] FloatOp less(const FloatOp &opA, float threshold) const;
-  [[nodiscard]] FloatOp equal(const FloatOp &opA, const FloatOp &opB) const;
-  [[nodiscard]] FloatOp equal(const FloatOp &opA, float threshold) const;
-  [[nodiscard]] FloatOp notEqual(const FloatOp &opA, const FloatOp &opB) const;
-  [[nodiscard]] FloatOp notEqual(const FloatOp &opA, float threshold) const;
-  [[nodiscard]] FloatOp and_(const FloatOp &opA, const FloatOp &opB,
+  [[nodiscard]] FloatOp crossed(const FloatOp opA, const FloatOp opB) const;
+  [[nodiscard]] FloatOp trendFlip(const FloatOp inputOp) const;
+  [[nodiscard]] FloatOp greater(const FloatOp opA, const FloatOp opB) const;
+  [[nodiscard]] FloatOp greater(const FloatOp opA, float threshold) const;
+  [[nodiscard]] FloatOp less(const FloatOp opA, const FloatOp opB) const;
+  [[nodiscard]] FloatOp less(const FloatOp opA, float threshold) const;
+  [[nodiscard]] FloatOp equal(const FloatOp opA, const FloatOp opB) const;
+  [[nodiscard]] FloatOp equal(const FloatOp opA, float threshold) const;
+  [[nodiscard]] FloatOp notEqual(const FloatOp opA, const FloatOp opB) const;
+  [[nodiscard]] FloatOp notEqual(const FloatOp opA, float threshold) const;
+  [[nodiscard]] FloatOp and_(const FloatOp opA, const FloatOp opB,
                              float threshold = 0.5f) const;
-  [[nodiscard]] FloatOp and_(const FloatOp &opA, const FloatOp &opB,
-                             const FloatOp &threshold) const;
-  [[nodiscard]] FloatOp or_(const FloatOp &opA, const FloatOp &opB,
+  [[nodiscard]] FloatOp and_(const FloatOp opA, const FloatOp opB,
+                             const FloatOp threshold) const;
+  [[nodiscard]] FloatOp or_(const FloatOp opA, const FloatOp opB,
                             float threshold = 0.5f) const;
-  [[nodiscard]] FloatOp or_(const FloatOp &opA, const FloatOp &opB,
-                            const FloatOp &threshold) const;
-  [[nodiscard]] FloatOp not_(const FloatOp &op) const;
-  [[nodiscard]] FloatOp xor_(const FloatOp &opA, const FloatOp &opB,
+  [[nodiscard]] FloatOp or_(const FloatOp opA, const FloatOp opB,
+                            const FloatOp threshold) const;
+  [[nodiscard]] FloatOp not_(const FloatOp op) const;
+  [[nodiscard]] FloatOp xor_(const FloatOp opA, const FloatOp opB,
                              float threshold = 0.5f) const;
-  [[nodiscard]] FloatOp xor_(const FloatOp &opA, const FloatOp &opB,
-                             const FloatOp &threshold) const;
-  [[nodiscard]] FloatOp nand(const FloatOp &opA, const FloatOp &opB,
+  [[nodiscard]] FloatOp xor_(const FloatOp opA, const FloatOp opB,
+                             const FloatOp threshold) const;
+  [[nodiscard]] FloatOp nand(const FloatOp opA, const FloatOp opB,
                              float threshold = 0.5f) const;
-  [[nodiscard]] FloatOp nand(const FloatOp &opA, const FloatOp &opB,
-                             const FloatOp &threshold) const;
-  [[nodiscard]] FloatOp nor(const FloatOp &opA, const FloatOp &opB,
+  [[nodiscard]] FloatOp nand(const FloatOp opA, const FloatOp opB,
+                             const FloatOp threshold) const;
+  [[nodiscard]] FloatOp nor(const FloatOp opA, const FloatOp opB,
                             float threshold = 0.5f) const;
-  [[nodiscard]] FloatOp nor(const FloatOp &opA, const FloatOp &opB,
-                            const FloatOp &threshold) const;
-  [[nodiscard]] FloatOp xnor(const FloatOp &opA, const FloatOp &opB,
+  [[nodiscard]] FloatOp nor(const FloatOp opA, const FloatOp opB,
+                            const FloatOp threshold) const;
+  [[nodiscard]] FloatOp xnor(const FloatOp opA, const FloatOp opB,
                              float threshold = 0.5f) const;
-  [[nodiscard]] FloatOp xnor(const FloatOp &opA, const FloatOp &opB,
-                             const FloatOp &threshold) const;
-  [[nodiscard]] FloatOp in(const FloatOp &op, float lo, float hi) const;
-  [[nodiscard]] FloatOp in(const FloatOp &op, const FloatOp &lo,
-                           const FloatOp &hi) const;
-  [[nodiscard]] FloatOp in(const FloatOp &op, float lo,
-                           const FloatOp &hi) const;
-  [[nodiscard]] FloatOp in(const FloatOp &op, const FloatOp &lo,
-                           float hi) const;
-  [[nodiscard]] FloatOp out(const FloatOp &op, float lo, float hi) const;
-  [[nodiscard]] FloatOp out(const FloatOp &op, const FloatOp &lo,
-                            const FloatOp &hi) const;
-  [[nodiscard]] FloatOp out(const FloatOp &op, float lo,
-                            const FloatOp &hi) const;
-  [[nodiscard]] FloatOp out(const FloatOp &op, const FloatOp &lo,
-                            float hi) const;
+  [[nodiscard]] FloatOp xnor(const FloatOp opA, const FloatOp opB,
+                             const FloatOp threshold) const;
+  [[nodiscard]] FloatOp in(const FloatOp op, float lo, float hi) const;
+  [[nodiscard]] FloatOp in(const FloatOp op, const FloatOp lo,
+                           const FloatOp hi) const;
+  [[nodiscard]] FloatOp in(const FloatOp op, float lo, const FloatOp hi) const;
+  [[nodiscard]] FloatOp in(const FloatOp op, const FloatOp lo, float hi) const;
+  [[nodiscard]] FloatOp out(const FloatOp op, float lo, float hi) const;
+  [[nodiscard]] FloatOp out(const FloatOp op, const FloatOp lo,
+                            const FloatOp hi) const;
+  [[nodiscard]] FloatOp out(const FloatOp op, float lo, const FloatOp hi) const;
+  [[nodiscard]] FloatOp out(const FloatOp op, const FloatOp lo, float hi) const;
   // End Digital Ops
 
-  [[nodiscard]] vector<float> normalize(const vector<float> &values) const;
+  [[nodiscard]] vector<float> normalize(const vector<float> values) const;
 
-  [[nodiscard]] vector<float>
-  floatArray(const FloatOp &op, int numSamples,
-             const FloatOp &mapOp = FloatOp()) const;
+  [[nodiscard]] vector<float> floatArray(const FloatOp op, int numSamples,
+                                         const FloatOp mapOp = FloatOp()) const;
 
-  [[nodiscard]] vector<glm::vec2> glv2Array(const FloatOp &curve, float start,
+  [[nodiscard]] vector<glm::vec2> glv2Array(const FloatOp curve, float start,
                                             float end, int numPoints,
                                             float yScale = 1.0f) const;
-  [[nodiscard]] vector<glm::vec3> glv3Array(const FloatOp &curve, float start,
+  [[nodiscard]] vector<glm::vec3> glv3Array(const FloatOp curve, float start,
                                             float end, int numPoints,
                                             float yScale = 1.0f) const;
-  [[nodiscard]] vector<ofVec2f> ofv2Array(const FloatOp &curve, float start,
+  [[nodiscard]] vector<ofVec2f> ofv2Array(const FloatOp curve, float start,
                                           float end, int numPoints,
                                           float yScale = 1.0f) const;
-  [[nodiscard]] vector<ofVec3f> ofv3Array(const FloatOp &curve, float start,
+  [[nodiscard]] vector<ofVec3f> ofv3Array(const FloatOp curve, float start,
                                           float end, int numPoints,
                                           float yScale = 1.0f) const;
 
@@ -283,7 +280,7 @@ public:
   [[nodiscard]] float pNoise(float x, float falloff = 1.f,
                              int octaves = 1) const;
 
-  void plot(const FloatOp &op, float yScale, ofColor color = ofColor::white,
+  void plot(const FloatOp op, float yScale, ofColor color = ofColor::white,
             bool fill = false) const;
 };
 } // namespace ofxCrvs
