@@ -131,6 +131,18 @@ float Ptrn::quantize(const float y, const int quantization) {
   return y;
 }
 
+void Ptrn::setTrigXInverted(const bool inverted) {
+  trigXInverted.store(inverted);
+}
+
+void Ptrn::setTrigYInverted(const bool inverted) {
+  trigYInverted.store(inverted);
+}
+
+void Ptrn::setTrigZInverted(const bool inverted) {
+  trigZInverted.store(inverted);
+}
+
 void Ptrn::setTrigXReversed(const bool reversed) {
   trigXReversed.store(reversed);
 }
@@ -376,7 +388,7 @@ float Ptrn::nextTrigX() {
   else if (idx < 0)
     idx = trigXCache.size() - 1;
   currentTrigXIndex.store(idx);
-  return trig;
+  return trigXInverted.load() ? trig == 0.f ? 1.f : 0.f : trig;
 }
 
 float Ptrn::nextTrigY() {
@@ -391,7 +403,7 @@ float Ptrn::nextTrigY() {
   else if (idx < 0)
     idx = trigYCache.size() - 1;
   currentTrigYIndex.store(idx);
-  return trig;
+  return trigYInverted.load() ? trig == 0.f ? 1.f : 0.f : trig;
 }
 
 float Ptrn::nextTrigZ() {
@@ -406,7 +418,7 @@ float Ptrn::nextTrigZ() {
   else if (idx < 0)
     idx = trigZCache.size() - 1;
   currentTrigZIndex.store(idx);
-  return trig;
+  return trigZInverted.load() ? trig == 0.f ? 1.f : 0.f : trig;
 }
 
 float Ptrn::nextValueX() {

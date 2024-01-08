@@ -34,7 +34,8 @@ public:
 
   std::vector<float> trigZPattern(int numStepsOverride = 0,
                                   float thresholdOverride = -1.f) const;
-
+  // TODO: trig patterns using logical operators i.e trigXANDTrigYPattern()
+  // maybe overload operator&& and operator|| for Ptrn?
   std::vector<float> valuePattern(int numStepsOverride = 0,
                                   int numValuesOverride = 0,
                                   Component component = Component::Y) const;
@@ -47,6 +48,9 @@ public:
   std::vector<glm::vec3> vectorPattern(int numStepsOverride = 0,
                                        bool transformed = true) const;
 
+  void setTrigXInverted(bool inverted);
+  void setTrigYInverted(bool inverted);
+  void setTrigZInverted(bool inverted);
   void setTrigXReversed(bool reversed);
   void setTrigYReversed(bool reversed);
   void setTrigZReversed(bool reversed);
@@ -161,6 +165,9 @@ private:
   std::atomic<int> numValuesY{0};
   std::atomic<int> numValuesZ{0};
 
+  std::atomic<bool> trigXInverted{false};
+  std::atomic<bool> trigYInverted{false};
+  std::atomic<bool> trigZInverted{false};
   std::atomic<bool> trigXReversed{false};
   std::atomic<bool> trigYReversed{false};
   std::atomic<bool> trigZReversed{false};
