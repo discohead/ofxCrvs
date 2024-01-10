@@ -42,7 +42,7 @@ std::vector<float> Ptrn::trigPattern(const int numStepsOverride,
     trigs = crv->floatArray(numSteps, component);
   }
   for (float &f : trigs) {
-    f = f > threshold ? 1.0 : 0.0;
+    f = (f / ampOffset.load()) > threshold ? 1.0 : 0.0;
   }
   return trigs;
 }
@@ -131,6 +131,36 @@ float Ptrn::quantize(const float y, const int quantization) {
   return y;
 }
 
+bool Ptrn::getTrigXTransformed() const { return transformedTrigX.load(); }
+
+bool Ptrn::getTrigYTransformed() const { return transformedTrigY.load(); }
+
+bool Ptrn::getTrigZTransformed() const { return transformedTrigZ.load(); }
+
+bool Ptrn::getValueXTransformed() const { return transformedValueX.load(); }
+
+bool Ptrn::getValueYTransformed() const { return transformedValueY.load(); }
+
+bool Ptrn::getValueZTransformed() const { return transformedValueZ.load(); }
+
+bool Ptrn::getTrigXInverted() const { return trigXInverted.load(); }
+
+bool Ptrn::getTrigYInverted() const { return trigYInverted.load(); }
+
+bool Ptrn::getTrigZInverted() const { return trigZInverted.load(); }
+
+bool Ptrn::getTrigXReversed() const { return trigXReversed.load(); }
+
+bool Ptrn::getTrigYReversed() const { return trigYReversed.load(); }
+
+bool Ptrn::getTrigZReversed() const { return trigZReversed.load(); }
+
+bool Ptrn::getValueXReversed() const { return valueXReversed.load(); }
+
+bool Ptrn::getValueYReversed() const { return valueYReversed.load(); }
+
+bool Ptrn::getValueZReversed() const { return valueZReversed.load(); }
+
 void Ptrn::setTrigXInverted(const bool inverted) {
   trigXInverted.store(inverted);
 }
@@ -218,6 +248,11 @@ void Ptrn::setNumValueZSteps(const int numSteps) {
   updateValueZCache();
 }
 
+void Ptrn::setNumVecSteps(const int numSteps) {
+  numVecSteps.store(numSteps);
+  updateVecCache();
+}
+
 void Ptrn::setNumValuesX(const int numValues) {
   numValuesX.store(numValues);
   updateValueXCache();
@@ -265,21 +300,25 @@ void Ptrn::setTransformedValueZ(const bool transformed) {
 
 void Ptrn::setAmpOffset(const float ampOffset) {
   crv->ampOffset = ampOffset;
+  this->ampOffset.store(ampOffset);
   updateCache();
 }
 
 void Ptrn::setRateOffset(const float rateOffset) {
   crv->rateOffset = rateOffset;
+  this->rateOffset.store(rateOffset);
   updateCache();
 }
 
 void Ptrn::setPhaseOffset(const float phaseOffset) {
   crv->phaseOffset = phaseOffset;
+  this->phaseOffset.store(phaseOffset);
   updateCache();
 }
 
 void Ptrn::setBiasOffset(const float biasOffset) {
   crv->biasOffset = biasOffset;
+  this->biasOffset.store(biasOffset);
   updateCache();
 }
 
@@ -383,10 +422,10 @@ float Ptrn::nextTrigX() {
     idx--;
   else
     idx++;
-  if (idx >= trigXCache.size())
-    idx = 0;
-  else if (idx < 0)
+  if (idx < 0)
     idx = trigXCache.size() - 1;
+  else if (idx >= trigXCache.size())
+    idx = 0;
   currentTrigXIndex.store(idx);
   return trigXInverted.load() ? trig == 0.f ? 1.f : 0.f : trig;
 }
@@ -398,10 +437,10 @@ float Ptrn::nextTrigY() {
     idx--;
   else
     idx++;
-  if (idx >= trigYCache.size())
-    idx = 0;
-  else if (idx < 0)
+  if (idx < 0)
     idx = trigYCache.size() - 1;
+  else if (idx >= trigYCache.size())
+    idx = 0;
   currentTrigYIndex.store(idx);
   return trigYInverted.load() ? trig == 0.f ? 1.f : 0.f : trig;
 }
@@ -413,10 +452,10 @@ float Ptrn::nextTrigZ() {
     idx--;
   else
     idx++;
-  if (idx >= trigZCache.size())
-    idx = 0;
-  else if (idx < 0)
+  if (idx < 0)
     idx = trigZCache.size() - 1;
+  else if (idx >= trigZCache.size())
+    idx = 0;
   currentTrigZIndex.store(idx);
   return trigZInverted.load() ? trig == 0.f ? 1.f : 0.f : trig;
 }
@@ -428,10 +467,10 @@ float Ptrn::nextValueX() {
     idx--;
   else
     idx++;
-  if (idx >= valueXCache.size())
-    idx = 0;
-  else if (idx < 0)
+  if (idx < 0)
     idx = valueXCache.size() - 1;
+  else if (idx >= valueXCache.size())
+    idx = 0;
   currentValueXIndex.store(idx);
   return value;
 }
@@ -443,10 +482,10 @@ float Ptrn::nextValueY() {
     idx--;
   else
     idx++;
-  if (idx >= valueYCache.size())
-    idx = 0;
-  else if (idx < 0)
+  if (idx < 0)
     idx = valueYCache.size() - 1;
+  else if (idx >= valueYCache.size())
+    idx = 0;
   currentValueYIndex.store(idx);
   return value;
 }
@@ -458,10 +497,10 @@ float Ptrn::nextValueZ() {
     idx--;
   else
     idx++;
-  if (idx >= valueZCache.size())
-    idx = 0;
-  else if (idx < 0)
+  if (idx < 0)
     idx = valueZCache.size() - 1;
+  else if (idx >= valueZCache.size())
+    idx = 0;
   currentValueZIndex.store(idx);
   return value;
 }
@@ -473,10 +512,10 @@ glm::vec3 Ptrn::nextVec() {
     idx--;
   else
     idx++;
-  if (idx >= vecCache.size())
-    idx = 0;
-  else if (idx < 0)
+  if (idx < 0)
     idx = vecCache.size() - 1;
+  else if (idx >= vecCache.size())
+    idx = 0;
   currentVecIndex.store(idx);
   return vec;
 }
@@ -499,37 +538,44 @@ std::array<std::array<float, 3>, 2> Ptrn::next() {
 }
 
 float Ptrn::trigXAt(const float pos) const {
-  const int idx = static_cast<int>(fmod(pos, 1.f) * trigXCache.size());
+  const int idx = static_cast<int>(fmod(trigXReversed ? 1.f - pos : pos, 1.f) *
+                                   trigXCache.size());
   return trigXCache[idx];
 }
 
 float Ptrn::trigYAt(const float pos) const {
-  const int idx = static_cast<int>(fmod(pos, 1.f) * trigYCache.size());
+  const int idx = static_cast<int>(fmod(trigYReversed ? 1.f - pos : pos, 1.f) *
+                                   trigYCache.size());
   return trigYCache[idx];
 }
 
 float Ptrn::trigZAt(const float pos) const {
-  const int idx = static_cast<int>(fmod(pos, 1.f) * trigZCache.size());
+  const int idx = static_cast<int>(fmod(trigZReversed ? 1.f - pos : pos, 1.f) *
+                                   trigZCache.size());
   return trigZCache[idx];
 }
 
 float Ptrn::valueXAt(const float pos) const {
-  const int idx = static_cast<int>(fmod(pos, 1.f) * valueXCache.size());
+  const int idx = static_cast<int>(fmod(valueXReversed ? 1.f - pos : pos, 1.f) *
+                                   valueXCache.size());
   return valueXCache[idx];
 }
 
 float Ptrn::valueYAt(const float pos) const {
-  const int idx = static_cast<int>(fmod(pos, 1.f) * valueYCache.size());
+  const int idx = static_cast<int>(fmod(valueYReversed ? 1.f - pos : pos, 1.f) *
+                                   valueYCache.size());
   return valueYCache[idx];
 }
 
 float Ptrn::valueZAt(const float pos) const {
-  const int idx = static_cast<int>(fmod(pos, 1.f) * valueZCache.size());
+  const int idx = static_cast<int>(fmod(valueZReversed ? 1.f - pos : pos, 1.f) *
+                                   valueZCache.size());
   return valueZCache[idx];
 }
 
 glm::vec3 Ptrn::vecAt(const float pos) const {
-  const int idx = static_cast<int>(fmod(pos, 1.f) * vecCache.size());
+  const int idx = static_cast<int>(fmod(vecReversed ? 1.f - pos : pos, 1.f) *
+                                   vecCache.size());
   return vecCache[idx];
 }
 

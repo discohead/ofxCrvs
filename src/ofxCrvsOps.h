@@ -68,10 +68,9 @@ public:
   [[nodiscard]] FloatOp bipolarize(const FloatOp unipolarOp) const;
   [[nodiscard]] FloatOp rectify(const FloatOp bipolarOp) const;
   [[nodiscard]] FloatOp c(float value) const;
-  [[nodiscard]] inline FloatOp
-  timePhasor(double cycleDurationSeconds = 2.0) const;
-  [[nodiscard]] inline FloatOp tempoPhasor(double barsPerCycle = 1.0,
-                                           double bpm = 120.0) const;
+  [[nodiscard]] FloatOp timePhasor(double cycleDurationSeconds = 2.0) const;
+  [[nodiscard]] FloatOp tempoPhasor(double barsPerCycle = 1.0,
+                                    double bpm = 120.0) const;
   [[nodiscard]] FloatOp phasor() const;
   [[nodiscard]] FloatOp saw() const;
   [[nodiscard]] FloatOp tri(const FloatOp s) const;

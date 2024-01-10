@@ -16,10 +16,10 @@ namespace ofxCrvs {
 class Ptrn {
 public:
   Ptrn()
-      : trigXCache(trigXPattern()), trigYCache(trigYPattern()),
-        trigZCache(trigZPattern()), valueXCache(valueXPattern()),
-        valueYCache(valueYPattern()), valueZCache(valueZPattern()),
-        vecCache(vectorPattern()) {}
+      : crv(Crv::create()), trigXCache(trigXPattern()),
+        trigYCache(trigYPattern()), trigZCache(trigZPattern()),
+        valueXCache(valueXPattern()), valueYCache(valueYPattern()),
+        valueZCache(valueZPattern()), vecCache(vectorPattern()) {}
   std::shared_ptr<Crv> crv;
 
   std::vector<float> trigPattern(int numStepsOverride = 0,
@@ -48,19 +48,43 @@ public:
   std::vector<glm::vec3> vectorPattern(int numStepsOverride = 0,
                                        bool transformed = true) const;
 
+  bool getTrigXTransformed() const;
+  bool getTrigYTransformed() const;
+  bool getTrigZTransformed() const;
+
+  bool getValueXTransformed() const;
+  bool getValueYTransformed() const;
+  bool getValueZTransformed() const;
+
+  bool getTrigXInverted() const;
+  bool getTrigYInverted() const;
+  bool getTrigZInverted() const;
+
+  bool getTrigXReversed() const;
+  bool getTrigYReversed() const;
+  bool getTrigZReversed() const;
+
+  bool getValueXReversed() const;
+  bool getValueYReversed() const;
+  bool getValueZReversed() const;
+
   void setTrigXInverted(bool inverted);
   void setTrigYInverted(bool inverted);
   void setTrigZInverted(bool inverted);
+
   void setTrigXReversed(bool reversed);
   void setTrigYReversed(bool reversed);
   void setTrigZReversed(bool reversed);
+
   void setValueXReversed(bool reversed);
   void setValueYReversed(bool reversed);
   void setValueZReversed(bool reversed);
   void setVecReversed(bool reversed);
+
   void setTrigXThreshold(float trigThreshold);
   void setTrigYThreshold(float trigThreshold);
   void setTrigZThreshold(float trigThreshold);
+
   void setSyncNext(bool sync);
   void setNumNextSteps(int numSteps);
   void setNumTrigXSteps(int numSteps);
@@ -69,23 +93,30 @@ public:
   void setNumValueXSteps(int numSteps);
   void setNumValueYSteps(int numSteps);
   void setNumValueZSteps(int numSteps);
+  void setNumVecSteps(int numSteps);
+
   void setNumValuesX(int numValues);
   void setNumValuesY(int numValues);
   void setNumValuesZ(int numValues);
+
   void setTransformedTrigX(bool transformed);
   void setTransformedTrigY(bool transformed);
   void setTransformedTrigZ(bool transformed);
+
   void setTransformedValueX(bool transformed);
   void setTransformedValueY(bool transformed);
   void setTransformedValueZ(bool transformed);
+
   void setAmpOffset(float ampOffset);
   void setRateOffset(float rateOffset);
   void setPhaseOffset(float phaseOffset);
   void setBiasOffset(float biasOffset);
+
   void setAmpModAmt(float ampModAmt);
   void setRateModAmt(float rateModAmt);
   void setPhaseModAmt(float phaseModAmt);
   void setBiasModAmt(float biasModAmt);
+
   void setOrigin(const glm::vec3 &origin);
   void setTranslation(const glm::vec3 &translation);
   void setScale(const glm::vec3 &scale);
@@ -137,13 +168,18 @@ public:
   void updateValueZCache();
   void updateVecCache();
 
-  size_t maxSize() const;
-
 private:
   std::atomic<bool> syncNext{true};
+
+  std::atomic<float> ampOffset{1.f};
+  std::atomic<float> rateOffset{1.f};
+  std::atomic<float> phaseOffset{0.f};
+  std::atomic<float> biasOffset{0.f};
+
   std::atomic<bool> transformedTrigX{false};
   std::atomic<bool> transformedTrigY{false};
   std::atomic<bool> transformedTrigZ{false};
+
   std::atomic<bool> transformedValueX{false};
   std::atomic<bool> transformedValueY{false};
   std::atomic<bool> transformedValueZ{false};
@@ -168,6 +204,7 @@ private:
   std::atomic<bool> trigXInverted{false};
   std::atomic<bool> trigYInverted{false};
   std::atomic<bool> trigZInverted{false};
+
   std::atomic<bool> trigXReversed{false};
   std::atomic<bool> trigYReversed{false};
   std::atomic<bool> trigZReversed{false};
