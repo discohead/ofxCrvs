@@ -16,37 +16,35 @@ namespace ofxCrvs {
 class Ptrn {
 public:
   Ptrn()
-      : crv(Crv::create()), trigXCache(trigXPattern()),
-        trigYCache(trigYPattern()), trigZCache(trigZPattern()),
-        valueXCache(valueXPattern()), valueYCache(valueYPattern()),
-        valueZCache(valueZPattern()), vecCache(vectorPattern()) {}
+      : crv(Crv::create()), trigXCache(trigsX()), trigYCache(trigsY()),
+        trigZCache(trigsZ()), valueXCache(valuesX()), valueYCache(valuesY()),
+        valueZCache(valuesZ()), vecCache(vecs()) {}
   std::shared_ptr<Crv> crv;
 
-  std::vector<float> trigPattern(int numStepsOverride = 0,
-                                 float thresholdOverride = -1.f,
-                                 Component component = Component::Y) const;
+  std::vector<float> trigs(int numStepsOverride = 0,
+                           float thresholdOverride = -1.f,
+                           Component component = Component::Y) const;
 
-  std::vector<float> trigXPattern(int numStepsOverride = 0,
-                                  float thresholdOverride = -1.f) const;
+  std::vector<float> trigsX(int numStepsOverride = 0,
+                            float thresholdOverride = -1.f) const;
 
-  std::vector<float> trigYPattern(int numStepsOverride = 0,
-                                  float thresholdOverride = -1.f) const;
+  std::vector<float> trigsY(int numStepsOverride = 0,
+                            float thresholdOverride = -1.f) const;
 
-  std::vector<float> trigZPattern(int numStepsOverride = 0,
-                                  float thresholdOverride = -1.f) const;
+  std::vector<float> trigsZ(int numStepsOverride = 0,
+                            float thresholdOverride = -1.f) const;
   // TODO: trig patterns using logical operators i.e trigXANDTrigYPattern()
   // maybe overload operator&& and operator|| for Ptrn?
-  std::vector<float> valuePattern(int numStepsOverride = 0,
-                                  int numValuesOverride = 0,
-                                  Component component = Component::Y) const;
-  std::vector<float> valueXPattern(int numStepsOverride = 0,
-                                   int numValuesOverride = 0) const;
-  std::vector<float> valueYPattern(int numStepsOverride = 0,
-                                   int numValuesOverride = 0) const;
-  std::vector<float> valueZPattern(int numStepsOverride = 0,
-                                   int numValuesOverride = 0) const;
-  std::vector<glm::vec3> vectorPattern(int numStepsOverride = 0,
-                                       bool transformed = true) const;
+  std::vector<float> values(int numStepsOverride = 0, int numValuesOverride = 0,
+                            Component component = Component::Y) const;
+  std::vector<float> valuesX(int numStepsOverride = 0,
+                             int numValuesOverride = 0) const;
+  std::vector<float> valuesY(int numStepsOverride = 0,
+                             int numValuesOverride = 0) const;
+  std::vector<float> valuesZ(int numStepsOverride = 0,
+                             int numValuesOverride = 0) const;
+  std::vector<glm::vec3> vecs(int numStepsOverride = 0,
+                              bool transformed = true) const;
 
   bool getTrigXTransformed() const;
   bool getTrigYTransformed() const;
@@ -124,26 +122,32 @@ public:
   void setBounding(Bounding bounding);
   void setCrv(const std::shared_ptr<Crv> &crv);
 
-  std::array<std::array<float, 3>, 2> next();
+  std::array<std::array<float, 2>, 3> next();
+  float nextTrig(Component component = Component::Y);
   float nextTrigX();
   float nextTrigY();
   float nextTrigZ();
+  float nextValue(Component component = Component::Y);
   float nextValueX();
   float nextValueY();
   float nextValueZ();
   glm::vec3 nextVec();
 
+  float trigAt(float pos, Component component = Component::Y) const;
   float trigXAt(float pos) const;
   float trigYAt(float pos) const;
   float trigZAt(float pos) const;
+  float valueAt(float pos, Component component = Component::Y) const;
   float valueXAt(float pos) const;
   float valueYAt(float pos) const;
   float valueZAt(float pos) const;
   glm::vec3 vecAt(float pos) const;
 
+  float trigAt(int index, Component component = Component::Y) const;
   float trigXAt(int index) const;
   float trigYAt(int index) const;
   float trigZAt(int index) const;
+  float valueAt(int index, Component component = Component::Y) const;
   float valueXAt(int index) const;
   float valueYAt(int index) const;
   float valueZAt(int index) const;

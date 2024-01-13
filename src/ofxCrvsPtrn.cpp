@@ -6,9 +6,9 @@
 
 namespace ofxCrvs {
 
-std::vector<float> Ptrn::trigPattern(const int numStepsOverride,
-                                     const float thresholdOverride,
-                                     const Component component) const {
+std::vector<float> Ptrn::trigs(const int numStepsOverride,
+                               const float thresholdOverride,
+                               const Component component) const {
   int numSteps = 0;
   float threshold = 0.f;
   bool transformed = false;
@@ -34,7 +34,7 @@ std::vector<float> Ptrn::trigPattern(const int numStepsOverride,
   }
   auto trigs = std::vector<float>(numSteps);
   if (transformed) {
-    std::vector<glm::vec3> v = vectorPattern(numSteps, true);
+    std::vector<glm::vec3> v = vecs(numSteps, true);
     for (int i = 0; i < numSteps; ++i) {
       trigs[i] = v[i][static_cast<int>(component)];
     }
@@ -47,24 +47,24 @@ std::vector<float> Ptrn::trigPattern(const int numStepsOverride,
   return trigs;
 }
 
-std::vector<float> Ptrn::trigXPattern(const int numStepsOverride,
-                                      const float thresholdOverride) const {
-  return trigPattern(numStepsOverride, thresholdOverride, Component::X);
+std::vector<float> Ptrn::trigsX(const int numStepsOverride,
+                                const float thresholdOverride) const {
+  return trigs(numStepsOverride, thresholdOverride, Component::X);
 }
 
-std::vector<float> Ptrn::trigYPattern(const int numStepsOverride,
-                                      const float thresholdOverride) const {
-  return trigPattern(numStepsOverride, thresholdOverride, Component::Y);
+std::vector<float> Ptrn::trigsY(const int numStepsOverride,
+                                const float thresholdOverride) const {
+  return trigs(numStepsOverride, thresholdOverride, Component::Y);
 }
 
-std::vector<float> Ptrn::trigZPattern(const int numStepsOverride,
-                                      const float thresholdOverride) const {
-  return trigPattern(numStepsOverride, thresholdOverride, Component::Z);
+std::vector<float> Ptrn::trigsZ(const int numStepsOverride,
+                                const float thresholdOverride) const {
+  return trigs(numStepsOverride, thresholdOverride, Component::Z);
 }
 
-std::vector<float> Ptrn::valuePattern(const int numStepsOverride,
-                                      const int numValuesOverride,
-                                      const Component component) const {
+std::vector<float> Ptrn::values(const int numStepsOverride,
+                                const int numValuesOverride,
+                                const Component component) const {
   int numSteps = 0;
   int numValues = 0;
   bool transformed = false;
@@ -87,7 +87,7 @@ std::vector<float> Ptrn::valuePattern(const int numStepsOverride,
   }
   auto p = std::vector<float>(numSteps);
   if (transformed) {
-    std::vector<glm::vec3> v = vectorPattern(numSteps, true);
+    std::vector<glm::vec3> v = vecs(numSteps, true);
     for (int i = 0; i < numSteps; ++i) {
       p[i] = v[i][static_cast<int>(component)];
     }
@@ -100,23 +100,23 @@ std::vector<float> Ptrn::valuePattern(const int numStepsOverride,
   return p;
 }
 
-std::vector<float> Ptrn::valueXPattern(const int numStepsOverride,
-                                       const int numValuesOverride) const {
-  return valuePattern(numStepsOverride, numValuesOverride, Component::X);
+std::vector<float> Ptrn::valuesX(const int numStepsOverride,
+                                 const int numValuesOverride) const {
+  return values(numStepsOverride, numValuesOverride, Component::X);
 }
 
-std::vector<float> Ptrn::valueYPattern(const int numStepsOverride,
-                                       const int numValuesOverride) const {
-  return valuePattern(numStepsOverride, numValuesOverride, Component::Y);
+std::vector<float> Ptrn::valuesY(const int numStepsOverride,
+                                 const int numValuesOverride) const {
+  return values(numStepsOverride, numValuesOverride, Component::Y);
 }
 
-std::vector<float> Ptrn::valueZPattern(const int numStepsOverride,
-                                       const int numValuesOverride) const {
-  return valuePattern(numStepsOverride, numValuesOverride, Component::Z);
+std::vector<float> Ptrn::valuesZ(const int numStepsOverride,
+                                 const int numValuesOverride) const {
+  return values(numStepsOverride, numValuesOverride, Component::Z);
 }
 
-std::vector<glm::vec3> Ptrn::vectorPattern(const int numStepsOverride,
-                                           const bool transformed) const {
+std::vector<glm::vec3> Ptrn::vecs(const int numStepsOverride,
+                                  const bool transformed) const {
   const int numSteps =
       numStepsOverride > 0 ? numStepsOverride : numValueYSteps.load();
   return crv->glv3Array(numSteps, false, transformed);
@@ -401,19 +401,30 @@ void Ptrn::updateCache() {
   updateVecCache();
 }
 
-void Ptrn::updateTrigXCache() { trigXCache.set(trigXPattern()); }
+void Ptrn::updateTrigXCache() { trigXCache.set(trigsX()); }
 
-void Ptrn::updateTrigYCache() { trigYCache.set(trigYPattern()); }
+void Ptrn::updateTrigYCache() { trigYCache.set(trigsY()); }
 
-void Ptrn::updateTrigZCache() { trigZCache.set(trigZPattern()); }
+void Ptrn::updateTrigZCache() { trigZCache.set(trigsZ()); }
 
-void Ptrn::updateValueXCache() { valueXCache.set(valueXPattern()); }
+void Ptrn::updateValueXCache() { valueXCache.set(valuesX()); }
 
-void Ptrn::updateValueYCache() { valueYCache.set(valueYPattern()); }
+void Ptrn::updateValueYCache() { valueYCache.set(valuesY()); }
 
-void Ptrn::updateValueZCache() { valueZCache.set(valueZPattern()); }
+void Ptrn::updateValueZCache() { valueZCache.set(valuesZ()); }
 
-void Ptrn::updateVecCache() { vecCache.set(vectorPattern()); }
+void Ptrn::updateVecCache() { vecCache.set(vecs()); }
+
+float Ptrn::nextTrig(const Component component) {
+  switch (component) {
+  case Component::X:
+    return nextTrigX();
+  case Component::Z:
+    return nextTrigZ();
+  default:
+    return nextTrigY();
+  }
+}
 
 float Ptrn::nextTrigX() {
   int idx = currentTrigXIndex.load();
@@ -458,6 +469,17 @@ float Ptrn::nextTrigZ() {
     idx = 0;
   currentTrigZIndex.store(idx);
   return trigZInverted.load() ? trig == 0.f ? 1.f : 0.f : trig;
+}
+
+float Ptrn::nextValue(const Component component) {
+  switch (component) {
+  case Component::X:
+    return nextValueX();
+  case Component::Z:
+    return nextValueZ();
+  default:
+    return nextValueY();
+  }
 }
 
 float Ptrn::nextValueX() {
@@ -520,7 +542,7 @@ glm::vec3 Ptrn::nextVec() {
   return vec;
 }
 
-std::array<std::array<float, 3>, 2> Ptrn::next() {
+std::array<std::array<float, 2>, 3> Ptrn::next() {
   int idx = currentNextIndex.load();
   if (idx >= numNextSteps.load()) {
     if (syncNext.load())
@@ -530,11 +552,22 @@ std::array<std::array<float, 3>, 2> Ptrn::next() {
     idx++;
   }
   currentNextIndex.store(idx);
-  const std::array<float, 3> trigs = {nextTrigX(), nextTrigY(), nextTrigZ()};
-  const std::array<float, 3> values = {nextValueX(), nextValueY(),
-                                       nextValueZ()};
-  const std::array<std::array<float, 3>, 2> trigsAndValues = {trigs, values};
-  return trigsAndValues;
+  const std::array<float, 2> x = {nextTrigX(), nextValueX()};
+  const std::array<float, 2> y = {nextTrigY(), nextValueY()};
+  const std::array<float, 2> z = {nextTrigZ(), nextValueZ()};
+  const std::array<std::array<float, 2>, 3> xyz = {x, y, z};
+  return xyz;
+}
+
+float Ptrn::trigAt(const float pos, const Component component) const {
+  switch (component) {
+  case Component::X:
+    return trigXAt(pos);
+  case Component::Z:
+    return trigZAt(pos);
+  default:
+    return trigYAt(pos);
+  }
 }
 
 float Ptrn::trigXAt(const float pos) const {
@@ -553,6 +586,17 @@ float Ptrn::trigZAt(const float pos) const {
   const int idx = static_cast<int>(fmod(trigZReversed ? 1.f - pos : pos, 1.f) *
                                    trigZCache.size());
   return trigZCache[idx];
+}
+
+float Ptrn::valueAt(const float pos, const Component component) const {
+  switch (component) {
+  case Component::X:
+    return valueXAt(pos);
+  case Component::Z:
+    return valueZAt(pos);
+  default:
+    return valueYAt(pos);
+  }
 }
 
 float Ptrn::valueXAt(const float pos) const {
@@ -579,11 +623,33 @@ glm::vec3 Ptrn::vecAt(const float pos) const {
   return vecCache[idx];
 }
 
+float Ptrn::trigAt(const int index, const Component component) const {
+  switch (component) {
+  case Component::X:
+    return trigXAt(index);
+  case Component::Z:
+    return trigZAt(index);
+  default:
+    return trigYAt(index);
+  }
+}
+
 float Ptrn::trigXAt(const int index) const { return trigXCache[index]; }
 
 float Ptrn::trigYAt(const int index) const { return trigYCache[index]; }
 
 float Ptrn::trigZAt(const int index) const { return trigZCache[index]; }
+
+float Ptrn::valueAt(const int index, const Component component) const {
+  switch (component) {
+  case Component::X:
+    return valueXAt(index);
+  case Component::Z:
+    return valueZAt(index);
+  default:
+    return valueYAt(index);
+  }
+}
 
 float Ptrn::valueXAt(const int index) const { return valueXCache[index]; }
 
